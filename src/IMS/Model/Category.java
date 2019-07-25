@@ -1,3 +1,5 @@
+package IMS.Model;
+
 public class Category {
   private int categoryID;
   private String categoryName;

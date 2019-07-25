@@ -1,5 +1,6 @@
+package IMS.Model;
 
-  public class Customer {
+public class Customer {
 
     private int customerID;
     private String name;

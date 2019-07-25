@@ -1,3 +1,5 @@
+package IMS.Model;
+
 public class RetailStore {
 
 

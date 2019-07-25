@@ -1,3 +1,5 @@
+package IMS.Model;
+
 public class Item {
   private int itemId;
   private int categoryID;
@@ -13,7 +15,7 @@ public class Item {
 
   @Override
   public String toString() {
-    return "Item{" +
+    return "IMS.Model.Item{" +
             "itemId=" + itemId +
             ", categoryID='" + categoryID + '\'' +
             ", itemName='" + itemName + '\'' +
