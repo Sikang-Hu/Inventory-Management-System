@@ -16,6 +16,6 @@ A course project of Database Management System
 - Reminder: notify users if some items is going to be out of storage [ ]
 
 ## Architecture 
-- Controller.Controller Java
-- Model Java
+- IMS.Controller.IMS.Controller Java
+- IMS.Model Java
 - View HTML, CSS, BootStrap, React, JavaScript

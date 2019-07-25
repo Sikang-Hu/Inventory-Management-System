@@ -1,4 +1,4 @@
-package Model;
+package IMS.Model;
 
 public class DummyModel implements InventoryModel {
 }

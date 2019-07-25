@@ -1,5 +1,6 @@
-package Controller;
+package IMS.Controller;
 
+import IMS.IMSException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,7 +77,7 @@ class Command {
    * @return a command object resulting from the given string
    * @throws IllegalArgumentException if given string does not fit any Type
    */
-  static Command parseCommand(String command) throws IllegalArgumentException {
+  static Command parseCommand(String command) throws IMSException {
     for (Type t : Type.values()) {
       Matcher m = t.pattern.matcher(command);
       if (m.matches()) {
@@ -87,7 +88,7 @@ class Command {
         return new Command(t, operands);
       }
     }
-    throw new IllegalArgumentException("Invalid Input: " + command);
+    throw new IMSException("Invalid Input: " + command);
   }
 
   /**

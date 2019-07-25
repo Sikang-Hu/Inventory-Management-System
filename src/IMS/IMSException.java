@@ -1,3 +1,5 @@
+package IMS;
+
 /**
  * This class represents exceptions indicating some kind of user error.
  */

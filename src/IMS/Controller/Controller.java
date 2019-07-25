@@ -1,6 +1,6 @@
-package Controller;
+package IMS.Controller;
 
-import Model.InventoryModel;
+import IMS.Model.InventoryModel;
 
 public interface Controller {
 
