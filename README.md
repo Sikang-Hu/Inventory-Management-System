@@ -24,9 +24,9 @@ A course project of Database Management System
 There is a dummy model which is a toy version of our final model. It has only one entity ORDER,
 which contains a bunch of ITEMS. An order can be initialized with a .odr file in below format:
 ```
-`<Supplier name>`
-`<Date>`
-`<name>` `<price>`
+<Supplier name>
+<Date>
+<name> <price>
 .
 .
 .
