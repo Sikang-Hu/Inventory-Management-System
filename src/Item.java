@@ -26,7 +26,7 @@ public class Item {
     return itemId;
   }
 
-  public void getItemId(int itemId) {
+  public void setItemId(int itemId) {
     this.itemId = itemId;
   }
 
