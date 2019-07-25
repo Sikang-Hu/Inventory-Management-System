@@ -1,9 +1,9 @@
-public class category {
+public class Category {
   private int categoryID;
   private String categoryName;
   private String categoryDescription;
 
-  public category(int categoryID, String categoryName, String categoryDescription){
+  public Category(int categoryID, String categoryName, String categoryDescription){
     this.categoryID = categoryID;
     this.categoryName = categoryName;
     this.categoryDescription = categoryDescription;
