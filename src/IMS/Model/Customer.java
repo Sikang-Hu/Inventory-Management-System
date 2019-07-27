@@ -2,30 +2,27 @@ package IMS.Model;
 
 public class Customer {
 
-    private int customerID;
-    private String name;
+  private int customerID;
+  private String customerName;
 
 
-    public Customer(String name) {
-      this.customerID = -1;
-      this.name = name;
-    }
+  public Customer(String name) {
+    this.customerID = -1;
+    this.customerName = name;
+  }
 
-    public Customer(int customerID, String name) {
-      this.customerID = customerID;
-      this.name = name;
-    }
+  public Customer(int customerID, String name) {
+    this.customerID = customerID;
+    this.customerName = name;
+  }
 
-    @Override
-    public String toString() {
-      return "customer{" +
-              "customerID=" + customerID +
-              ", name='" + name + '\'' +
-              '}';
-    }
-
-
-
+  @Override
+  public String toString() {
+    return "customer{" +
+            "customerID=" + customerID +
+            ", name='" + customerName + '\'' +
+            '}';
+  }
 
 
   public int getCustomerID() {
@@ -37,11 +34,11 @@ public class Customer {
   }
 
   public String getName() {
-    return name;
+    return customerName;
   }
 
   public void setName(String name) {
-    this.name = name;
+    this.customerName = name;
   }
 
 

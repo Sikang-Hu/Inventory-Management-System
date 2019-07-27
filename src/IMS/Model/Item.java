@@ -6,7 +6,7 @@ public class Item {
   private String itemName;
   private int itemPrice;
 
-  public Item(int itemId, int categoryID, String itemName, int itemPrice){
+  public Item(int itemId, int categoryID, String itemName, int itemPrice) {
     this.itemId = itemId;
     this.categoryID = categoryID;
     this.itemName = itemName;
@@ -48,10 +48,11 @@ public class Item {
     this.itemName = itemName;
   }
 
-  public int getItemPrice(){
+  public int getItemPrice() {
     return itemPrice;
   }
-  public void setItemPrice(int itemPrice){
+
+  public void setItemPrice(int itemPrice) {
     this.itemPrice = itemPrice;
   }
 }

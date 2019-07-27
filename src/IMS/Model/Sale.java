@@ -1,4 +1,4 @@
-package IMS.Controller;
+package IMS.Model;
 
 import java.util.Date;
 
@@ -8,7 +8,7 @@ public class Sale {
   private int customerID;
   private Date saleDate;
 
-  public Sale(int saleID, int storeID, int customerID, Date saleDate){
+  public Sale(int saleID, int storeID, int customerID, Date saleDate) {
     this.saleID = saleID;
     this.storeID = storeID;
     this.customerID = customerID;
@@ -46,15 +46,16 @@ public class Sale {
     return customerID;
   }
 
-  public void setCustomerID(int  customerID) {
+  public void setCustomerID(int customerID) {
     this.customerID = customerID;
   }
 
-  public Date getSaleDate(){
+  public Date getSaleDate() {
     return saleDate;
   }
-  public void setSaleDate(Date saleDate){
+
+  public void setSaleDate(Date saleDate) {
     this.saleDate = saleDate;
   }
-  
+
 }
