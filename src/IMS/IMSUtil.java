@@ -4,7 +4,7 @@ import java.sql.*;
 
 
 /**
- * This class stores all the facilities for the Inventory Management System.
+ * This class stores all the facilities for the Inventory Management System. 1
  */
 public class IMSUtil {
 
