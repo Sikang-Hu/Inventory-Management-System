@@ -14,7 +14,7 @@ public class Order implements Serializable {
   private Date date;
   private List<Item> items = new ArrayList<>();
   private static Pattern supPtn = Pattern.compile("Suppiler: \\S+\n");
-  private static Pattern itmPtn = Pattern.compile("(\\S+) (\\d+) (\\S)")
+  private static Pattern itmPtn = Pattern.compile("(\\S+) (\\d+) (\\S)");
 
 
   public Order(String order) {
