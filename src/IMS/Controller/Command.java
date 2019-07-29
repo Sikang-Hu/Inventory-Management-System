@@ -40,9 +40,25 @@ class Command {
   enum Type {
 
     /**
-     * Load command, the format should be {@code load <filepath>}.
+     * Insert command, which insert an entities to the database the format should be {
+     * @code insert <entities> <name> <cat> <unit price>}.
      */
-    ADD("add (\\s+)+");
+    INSERT_ITEM("insert item (\\S+) (\\S+) (-?\\d+(?:\\.\\d{0,2})?)"),
+
+    /**
+     * Get command, query a entities from the database the format should be {@code get <entities> <name>}.
+     */
+    GET_ITEM("get item (?: (\\w+))+"),
+
+    /**
+     *
+     */
+    INSERT_ORDER("insert order ((?:\\S+)\\.odr)"),
+
+    /**
+     * exit/quit the system.
+     */
+    QUIT,EXIT;
 
     /**
      * The pattern that commands of this type need to follow.

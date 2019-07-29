@@ -1,49 +1,56 @@
 package IMS.Model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by Sikang on 2019-07-25.
  */
-public class Order {
+public class Order implements Serializable {
   private String supplier;
   private Date date;
-  List<Item> items = new ArrayList<>();
+  private List<Item> items = new ArrayList<>();
+  private static Pattern supPtn = Pattern.compile("Suppiler: \\S+\n");
+  private static Pattern itmPtn = Pattern.compile("(\\S+) (\\d+) (\\S)")
 
-//  protected void write() {
-//    try(BufferedWriter wt = new BufferedWriter(new FileWriter(data, true))) {
-//      wt.append(this.supplier).append(",");
-//    } catch (IOException e) {
-//      // do nothing
-//    }
-//  }
 
-  public Order(File f) {
-    String ln;
-    try (BufferedReader rd = new BufferedReader(new FileReader(f))){
-      this.supplier = rd.readLine();
-      this.date = new SimpleDateFormat("dd/MM/yyyy").parse(rd.readLine());
-      while ((ln = rd.readLine()) != null) {
-        String[] item = ln.split(" ");
-        this.items.add(new Item(item[0], Double.parseDouble(item[1])));
+  public Order(String order) {
+    try {
+      Scanner scan = new Scanner(order);
+      this.supplier = scan.next(supPtn);
+      this.date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(scan.nextLine());
+      while (scan.hasNextLine()) {
+
       }
-    } catch (IOException e) {
+    } catch (NumberFormatException e) {
       // also do nothing
-    } catch (ParseException p) {
-      System.out.println(p.getErrorOffset());
+    } catch (ParseException e) {
+
     }
   }
 
-  protected void write(Appendable ap) throws IOException{
-    ap.append(this.toString());
+  public String getSupplier() {
+    return this.supplier;
+  }
+
+  public double getTotal() {
+    return this.items.stream().mapToDouble(Item::getPrice).sum();
+  }
+
+  public Date getDate() {
+    return this.date;
+  }
+
+  public Iterator<Item> getItems() {
+    return items.iterator();
+  }
+
+  void insertToDB() {
+
+
   }
 
   @Override
@@ -56,4 +63,7 @@ public class Order {
     sb.deleteCharAt(sb.lastIndexOf(","));
     return sb.toString();
   }
+
 }
+
+class OrderList extends ArrayList<Order> implements Serializable {}

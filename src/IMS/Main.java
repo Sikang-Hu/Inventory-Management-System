@@ -1,8 +1,11 @@
 package IMS;
 
+import IMS.Controller.Controller;
+import IMS.Controller.ControllerImpl;
 import IMS.Model.DummyModel;
 import IMS.Model.InventoryModel;
-import IMS.Model.Order;
+
+import java.io.*;
 
 /**
  * This is the entrance of the whole project.
@@ -10,6 +13,8 @@ import IMS.Model.Order;
 public class Main {
   public static void main(String... args) {
     InventoryModel model = new DummyModel();
-    model.insertOrder("./o2.odr");
+    Controller c = new ControllerImpl(model);
+    c.commandUserInterface();
+
   }
 }
