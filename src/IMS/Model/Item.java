@@ -1,91 +1,66 @@
 package IMS.Model;
 
-import IMS.IMSException;
-import IMS.IMSUtil;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.HashMap;
-
 /**
  * Created by Sikang on 2019-07-25.
  */
-public class Item implements Serializable {
-  private String name;
-  private String category;
-  private Double price;
-  private static String dbAddr = ".item";
+public class Item {
+    private int itemId;
+    private String categoryName;
+    private String itemName;
+    private double itemPrice;
 
-
-
-  public Item(String name, String category, double unitPrice) {
-    this.name = name;
-    this.category = category;
-    this.price = unitPrice;
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public String getCategory() {
-    return this.category;
-  }
-
-  public double getPrice() {
-    return this.price;
-  }
-
-  /**
-   * Insert this item into item table
-   */
-  void insertToDB() {
-    File itemDB = Item.checkInit();
-    HashMap<String, Item> items = IMSUtil.readObject(itemDB, ItemMap.class);
-    if (items.containsKey(this.name)) {
-      throw new IMSException("Item: %s is already in the database", this.name);
-    } else {
-      items.put(this.name, this);
-      IMSUtil.writeObject(items, itemDB);
+    // TODO: access can be package private
+    public Item(int itemId, String categoryName, String itemName, double itemPrice) {
+        this.itemId = itemId;
+        this.categoryName = categoryName;
+        this.itemName = itemName;
+        this.itemPrice = itemPrice;
     }
-  }
 
-  /**
-   * Fetch out the item named NAME
-   * @param name
-   * @return
-   */
-  static Item getItem(String name) {
-    File itemDB = Item.checkInit();
-    HashMap<String, Item> items = IMSUtil.readObject(itemDB, ItemMap.class);
-    Item result = items.get(name);
-    if (result == null) {
-      throw new IMSException("Item: %s does not exist in the system", name);
-    } else {
-      return result;
+    public Item(String categoryName, String itemName, double itemPrice) {
+        this(-1, categoryName, itemName, itemPrice);
     }
-  }
 
-  @Override
-  public String toString() {
-    return String.format("%s, %s, %.2f", this.name, this.category, this.price);
-  }
-
-  private static File checkInit() {
-    File itemDB = new File(Item.dbAddr);
-    if (!itemDB.exists() || itemDB.isDirectory()) {
-      IMSUtil.writeObject(new ItemMap(), itemDB);
+    @Override
+    public String toString() {
+        return "IMS.Model.Item{" +
+                "itemId=" + itemId +
+                ", categoryID='" + categoryName + '\'' +
+                ", itemName='" + itemName + '\'' +
+                ", itemPrice=" + itemPrice +
+                '}';
     }
-    return itemDB;
-  }
 
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public double getItemPrice() {
+        return itemPrice;
+    }
+
+    public void setItemPrice(int itemPrice) {
+        this.itemPrice = itemPrice;
+    }
 }
-
-/**
- * Wrap the generic HashMap to get away from trivial warning.
- */
-class ItemMap extends HashMap<String, Item> implements Serializable {
-
-}
-
-
