@@ -1,19 +1,15 @@
 package IMS.Model;
 
 public interface IDatabaseSQL {
-    public int insertItem(Item item);
+    public int insertItem(int itemId, int categoryID, String itemName, int itemPrice);
 
-    public int insertSupplyOrder(SupplyOrder supplyOrder);
+    public int insertVendor(String vendorName, String vendorAddress, String vendorState, int vendorZip,String vendorDescription);
 
-    public int insertVendor(Vendor vendor);
+    public int insertRetailStore(String storeAddress,String StoreState, int storeZip);
 
-    public int insertRetailStore(RetailStore retailStore);
+    public int insertCategory(String categoryName, String categoryDescription);
 
-    public int insertSale(Sale sale);
-
-    public int insertCategory(Category category);
-
-    public int insertCustomer(Customer customer);
+    public int insertCustomer(String customerName);
 
     public void authenticate(String user, String password);
 
