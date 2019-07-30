@@ -48,13 +48,14 @@ class Command {
     /**
      * Get command, query a entities from the database the format should be {@code get <entities> <name>}.
      */
-    GET_ITEM("get item (?: (\\w+))+"),
+    GET_ITEM("get item(?: (\\w+))+"),
 
     /**
      *
      */
     INSERT_ORDER("insert order ((?:\\S+)\\.odr)"),
 
+    INV_STATUS,
     /**
      * exit/quit the system.
      */

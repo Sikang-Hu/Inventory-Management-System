@@ -70,7 +70,7 @@ public class ControllerImpl implements Controller {
     public void commandUserInterface() {
         this.appendTo("Inventory Management System v 0.1.0 :\r\n");
         while (true) {
-            String ln = null;
+            String ln;
             try {
                 ln = this.input.readLine();
                 Command c = Command.parseCommand(ln);

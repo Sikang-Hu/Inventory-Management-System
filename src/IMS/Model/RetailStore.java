@@ -35,8 +35,9 @@ public class RetailStore {
     }
 
 
+
     public int getStoreId() {
-        return storeId;
+        return this.storeId;
     }
 
     private void setStoreId(int storeId) {

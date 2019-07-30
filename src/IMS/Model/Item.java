@@ -1,5 +1,12 @@
 package IMS.Model;
 
+import IMS.IMSException;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
  * Created by Sikang on 2019-07-25.
  */
@@ -10,15 +17,48 @@ public class Item {
     private double itemPrice;
 
     // TODO: access can be package private
-    public Item(int itemId, String categoryName, String itemName, double itemPrice) {
+    Item(int itemId, String categoryName, String itemName, double itemPrice) {
         this.itemId = itemId;
         this.categoryName = categoryName;
         this.itemName = itemName;
         this.itemPrice = itemPrice;
     }
 
-    public Item(String categoryName, String itemName, double itemPrice) {
+    Item(String categoryName, String itemName, double itemPrice) {
         this(-1, categoryName, itemName, itemPrice);
+    }
+
+    // TODO: Use lambda to abstract
+    void insertItem() {
+        try (Connection con = DatabaseUtil.createConnection();
+             Statement stmt = con.createStatement()) {
+            this.itemId = stmt.executeUpdate(this.insertStmt(Category.getCatId(stmt, this.categoryName))
+                    , Statement.RETURN_GENERATED_KEYS);
+        } catch (SQLException e) {
+            throw new IMSException(e.getMessage());
+        }
+    }
+
+    static Item getItem(String name) {
+        try (Connection con = DatabaseUtil.createConnection();
+             Statement stmt = con.createStatement()) {
+            String sql = String.format("SELECT * FROM item WHERE item_name = %s;", name);
+            ResultSet rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                return new Item(rs.getInt(1), Category.getCatName(stmt, rs.getInt(2))
+                        , rs.getString(3), rs.getDouble(4));
+            } else {
+                throw new IMSException("Item: % doesn't exist");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String insertStmt(int catId) {
+        return String.format("INSERT INTO item VALUES (%s, %d, %.2f)"
+                , this.itemName, catId, this.itemPrice);
     }
 
     @Override
