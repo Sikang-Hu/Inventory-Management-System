@@ -5,6 +5,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +43,7 @@ public class DatabaseSQL {
    */
   public int addNewOrder(String ven_name, String store_address,
                          String order_date, List<String> itemInfo)
-          throws IllegalArgumentException {
+          throws IllegalArgumentException{
     int order_id = -1;
 
     //prase string order_date
@@ -70,9 +71,17 @@ public class DatabaseSQL {
 
     //get order_id
     order_id = addNewOrderHelper(ven_id, store_id, date);
-    Map<Item, Integer>itemQuantityMap = processItemList(itemInfo);
-    addOrderHasItem(order_id, itemQuantityMap);
+    if (order_id != -1) {
+      Map<Item, Integer> itemQuantityMap = processItemList(order_id, itemInfo);
+      addOrderHasItem(order_id, itemQuantityMap);
+    }
+
     return order_id;
+  }
+
+  private void orderRollBack(int order_id){
+    dbu.delete("order_has_item", "order_id = "+ order_id);
+    dbu.delete("supply_order", "order_id = "+ order_id);
   }
 
   /**
@@ -93,7 +102,7 @@ public class DatabaseSQL {
    * @param itemInfo in the formate of “iteme_name, item_quantity, unit_cost”
    * @return Map of Item Object and it's quantity
    */
-  private Map<Item, Integer> processItemList(List<String> itemInfo)
+  private Map<Item, Integer> processItemList(int order_id, List<String> itemInfo)
           throws IllegalArgumentException {
     Map<Item, Integer> result = new HashMap<>();
     String item_name;
@@ -106,6 +115,7 @@ public class DatabaseSQL {
       int item_id = dbu.findTerm("item", "item_id", "item_name = '"
               + item_name + "'");
       if (item_id == -1) {
+        orderRollBack(order_id);
         throw new IllegalArgumentException("Item is not in the database, add item first. ");
       }
 
@@ -140,10 +150,10 @@ public class DatabaseSQL {
       }
       stmt.close();
     } catch (SQLException e) {
+      orderRollBack(order_id);
       System.err.println(e.getMessage());
       e.printStackTrace();
     }
-
   }
 
   /**

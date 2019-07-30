@@ -188,6 +188,19 @@ public class IMSUtil {
   }
 
 
+  public void delete(String table, String whereTerm) {
+    try {
+      Connection con = getConnection();
+      Statement stmt = con.createStatement();
+      String sql = "DELETE from "+ table + " WHERE " + whereTerm;
+      System.out.println(sql);
+      stmt.executeUpdate(sql);
+    }catch (SQLException e) {
+      System.err.println(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
 
 }
 
