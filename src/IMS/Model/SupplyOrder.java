@@ -9,26 +9,23 @@ public class SupplyOrder {
   private int store_id;
   private Date order_date;
   private Date delivery_date;
-  private List<ItemInOrder> items;
 
   public SupplyOrder( int ven_id, int store_id,
-                      Date order_date, List<ItemInOrder> items) {
+                      Date order_date) {
     this.order_id = -1;
     this.ven_id = ven_id;
     this.store_id = store_id;
     this.order_date = order_date;
     this.delivery_date = null;
-    this.items = items;
   }
 
   public SupplyOrder( int order_id, int ven_id, int store_id,
-                      Date order_date, List<ItemInOrder> items) {
+                      Date order_date, List<Item> items) {
     this.order_id = order_id;
     this.ven_id = ven_id;
     this.store_id = store_id;
     this.order_date = order_date;
     this.delivery_date = null;
-    this.items = items;
   }
 
   public Date getDelivery_date() {

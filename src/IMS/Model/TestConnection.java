@@ -1,20 +1,23 @@
 package IMS.Model;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TestConnection {
 
-  private static SQL sql = new SQL();
+  private static DatabaseSQL sql = new DatabaseSQL();
 
   public static void main(String[] args) throws Exception {
     sql.authenticate("weihan", "lwh@123456");
-    System.out.println("Connected.");
-    sql.UpdateDeliveryDate(6);
-    SupplyOrder o = new SupplyOrder(2, 2, new Date());
-    sql.addNewOrder(o);
-    Sale s = new Sale(1, 4, new Date());
-    sql.addNewSale(s);
+    List<String> itemInfo = new ArrayList<>();
+    itemInfo.add("apple,50,0.4");
+    itemInfo.add("dragon fruit,1,1.0");
+    sql.addNewOrder("Ward, Shields and Oberbrunner","Thanos Street",
+            "2019-07-19", itemInfo);
     sql.closeConnection();
   }
 

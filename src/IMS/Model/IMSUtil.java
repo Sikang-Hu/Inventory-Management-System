@@ -87,7 +87,8 @@ public class IMSUtil {
     try {
       Connection con = getConnection();
       Statement stmt = con.createStatement();
-      String sqlGet = "SELECT " + keyColumn + " FROM " + table + " WHERE " + valueColumn + " = '" + term.toUpperCase() + "'";
+      String sqlGet = "SELECT " + keyColumn + " FROM " + table + " WHERE " + valueColumn
+              + " = '" + term.toUpperCase() + "'";
       ResultSet rs = stmt.executeQuery(sqlGet);
       if (rs.next())
         key = rs.getInt(1);
@@ -117,18 +118,17 @@ public class IMSUtil {
    * @return -1 if update didn't process, otherwise return either (1) the row count for SQL Data
    * Manipulation Language (DML) statements or (2) 0 for SQL statements that return nothing
    */
-  public int updateTerm(String table, String setCol, String setVal, String whereCol, String whereVal) {
+  public int updateTerm(String table, String setCol, String setVal, String whereTerm) {
 
     int key = -1;
 
     try {
       Connection con = getConnection();
       Statement stmt = con.createStatement();
-      String sqlGet = "UPDATE " + table + " SET " + setCol + " = " + setVal + " WHERE " + whereCol + " = " + whereVal;
+      String sqlGet = "UPDATE " + table + " SET " + setCol + " = " + setVal + " WHERE " + whereTerm;
       System.out.println(sqlGet);
       key = stmt.executeUpdate(sqlGet);
       stmt.close();
-
 
     } catch (SQLException e) {
       System.err.println(e.getMessage());
@@ -142,18 +142,16 @@ public class IMSUtil {
    * Find and return the term id(PK) by it's value. Return -1 if not found
    * @param table
    * @param keyColumn
-   * @param valueColumn
-   * @param term
+   * @param whereTerm conditional term after WHERE
    * @return term id (PK) if found, -1 otherwise.
    */
-  public int findTerm(String table, String keyColumn, String valueColumn, String term) {
+  public int findTerm(String table, String keyColumn, String whereTerm) {
     int key = -1;
 
     try {
       Connection con = getConnection();
       Statement stmt = con.createStatement();
-      String sqlGet = "SELECT " + keyColumn + " FROM " + table + " WHERE " + valueColumn + " = '"
-              + term.toUpperCase() + "'";
+      String sqlGet = "SELECT " + keyColumn + " FROM " + table + " WHERE " + whereTerm;
       ResultSet rs = stmt.executeQuery(sqlGet);
       if (rs.next())
         key = rs.getInt(1);
@@ -168,17 +166,16 @@ public class IMSUtil {
     return key;
   }
 
-  public int findIntTerm(String table, String keyColumn, String valueColumn, int term) {
-    int key = -1;
 
+  public ResultSet findRow(String table, String whereTerm) {
+    ResultSet result = null;
     try {
       Connection con = getConnection();
       Statement stmt = con.createStatement();
-      String sqlGet = "SELECT " + keyColumn + " FROM " + table + " WHERE " + valueColumn + " = "
-              + term + "";
+      String sqlGet = "SELECT *" + " FROM " + table + " WHERE " + whereTerm;
       ResultSet rs = stmt.executeQuery(sqlGet);
       if (rs.next())
-        key = rs.getInt(1);
+        result = rs;
 
       rs.close();
       stmt.close();
@@ -187,8 +184,11 @@ public class IMSUtil {
       System.err.println(e.getMessage());
       e.printStackTrace();
     }
-    return key;
+    return result;
   }
+
+
+
 }
 
 
