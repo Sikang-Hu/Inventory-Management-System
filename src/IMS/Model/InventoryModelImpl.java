@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class InventoryModelImpl implements InventoryModel {
     @Override
-    public void insertItem(String name, String category, double unitPrice) {
-        Item i = new Item(name, category, unitPrice);
+    public void insertItem(String category, String name, double unitPrice) {
+        Item i = new Item(category, name, unitPrice);
         i.insertItem();
     }
 

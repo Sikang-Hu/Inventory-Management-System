@@ -1,6 +1,9 @@
 package IMS.Controller;
 
 import IMS.IMSException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,17 +46,19 @@ class Command {
      * Insert command, which insert an entities to the database the format should be {
      * @code insert <entities> <name> <cat> <unit price>}.
      */
-    INSERT_ITEM("insert item (\\S+) (\\S+) (-?\\d+(?:\\.\\d{0,2})?)"),
+    INSERT_ITEM("insert item (?:(\\w+)|(?:\'([^']+)\')) (?:(\\w+)|(?:\'([^']+)\')) (-?\\d+(?:\\.\\d{0,2})?)"),
 
     /**
      * Get command, query a entities from the database the format should be {@code get <entities> <name>}.
      */
-    GET_ITEM("get item(?: (\\w+))+"),
+    GET_ITEM("get item (?:(\\w+)|(?:\'([^']+)\'))"),
 
     /**
      *
      */
     INSERT_ORDER("insert order ((?:\\S+)\\.odr)"),
+
+    INSERT_SALE,
 
     INV_STATUS,
     /**
@@ -98,11 +103,15 @@ class Command {
     for (Type t : Type.values()) {
       Matcher m = t.pattern.matcher(command);
       if (m.matches()) {
-        String[] operands = new String[m.groupCount()];
+        List<String> l = new ArrayList<>();
+        String temp;
         for (int i = 0; i < m.groupCount(); i++) {
-          operands[i] = m.group(i + 1);
+          temp = m.group(i + 1);
+          if (temp != null) {
+            l.add(temp);
+          }
         }
-        return new Command(t, operands);
+        return new Command(t, l.toArray(new String[0]));
       }
     }
     throw new IMSException("Invalid Input: " + command);

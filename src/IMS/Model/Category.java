@@ -47,12 +47,13 @@ public class Category {
     }
 
     static int getCatId(Statement stmt, String name) throws SQLException {
-        String sql = String.format("SELECT cat_id FROM item_category WHERE cat_name = %s;", name);
+        String sql = String.format("SELECT cat_id FROM item_category WHERE cat_name = \'%s\';", name);
         ResultSet rs = stmt.executeQuery(sql);
         if (rs.next()) {
             return rs.getInt(1);
+        } else {
+            throw new IMSException("Category %s doesn't exist", name);
         }
-        throw new IMSException("Category %s doesn't exist", name);
     }
 
     static String getCatName(Statement stmt, int catId) throws SQLException{

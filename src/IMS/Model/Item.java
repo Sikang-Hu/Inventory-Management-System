@@ -32,9 +32,11 @@ public class Item {
     void insertItem() {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
+            System.out.println(this.insertStmt(Category.getCatId(stmt, this.categoryName)));
             this.itemId = stmt.executeUpdate(this.insertStmt(Category.getCatId(stmt, this.categoryName))
                     , Statement.RETURN_GENERATED_KEYS);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new IMSException(e.getMessage());
         }
     }
@@ -42,13 +44,14 @@ public class Item {
     static Item getItem(String name) {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
-            String sql = String.format("SELECT * FROM item WHERE item_name = %s;", name);
+            String sql = String.format("SELECT * FROM item WHERE item_name = \'%s\';", name);
             ResultSet rs = stmt.executeQuery(sql);
             if (rs.next()) {
+                double price = rs.getDouble(4);
                 return new Item(rs.getInt(1), Category.getCatName(stmt, rs.getInt(2))
-                        , rs.getString(3), rs.getDouble(4));
+                        , name, price);
             } else {
-                throw new IMSException("Item: % doesn't exist");
+                throw new IMSException("Item: %s doesn't exist", name);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -57,8 +60,8 @@ public class Item {
     }
 
     private String insertStmt(int catId) {
-        return String.format("INSERT INTO item VALUES (%s, %d, %.2f)"
-                , this.itemName, catId, this.itemPrice);
+        return String.format("INSERT INTO item (cat_id, item_name, item_unit_price) VALUES (%d, \'%s\', %.2f)"
+                , catId, this.itemName, this.itemPrice);
     }
 
     @Override
