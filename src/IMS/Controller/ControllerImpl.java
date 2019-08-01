@@ -3,12 +3,15 @@ package IMS.Controller;
 import IMS.IMSException;
 import IMS.Model.InventoryModel;
 import IMS.Model.Item;
+import IMS.Model.Vendor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -58,6 +61,28 @@ public class ControllerImpl implements Controller {
         Item i = this.model.getItem(name[0]);
         this.appendTo(i.toString());
 
+    }
+
+    public void getSoldItem(String... vendor) {
+        if (illegalArgs(1, vendor)) {
+            return;
+        }
+        HashSet<Item> set = this.model.getSoldItems(vendor[0]);
+        for (Item i : set) {
+            this.appendTo(i.toString());
+            this.appendTo("\n");
+        }
+    }
+
+    public void getVendor(String... vendor) {
+        if (illegalArgs(1, vendor)) {
+            return;
+        }
+        List<Vendor> vendors = this.model.getVendor(vendor[0]);
+        for (Vendor v : vendors) {
+            this.appendTo(v.toString());
+            this.appendTo("\n");
+        }
     }
 
     public void insertOrder(String... path) {
@@ -120,6 +145,11 @@ public class ControllerImpl implements Controller {
         commands.put(Command.Type.GET_ITEM, this::queryItem);
         commands.put(Command.Type.INSERT_ITEM, this::insertItem);
         commands.put(Command.Type.INSERT_ORDER, this::insertOrder);
+
+        commands.put(Command.Type.GET_VENDOR, this::getVendor);
+        commands.put(Command.Type.GET_SOLD_ITEM, this::getSoldItem);
+
+
         commands.put(Command.Type.EXIT, i->System.exit(0));
         commands.put(Command.Type.QUIT, i->System.exit(1));
     }

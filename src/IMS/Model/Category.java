@@ -46,6 +46,20 @@ public class Category {
         return categoryName;
     }
 
+    int insertCat() {
+        try (Connection con = DatabaseUtil.createConnection();
+             Statement stmt = con.createStatement()) {
+            this.categoryID = stmt.executeUpdate(
+                    "INSERT INTO item_category (cat_name, cat_description) VALUES (\'"
+                            + this.categoryName + "\', \'"
+                            + this.categoryDescription + "\');", Statement.RETURN_GENERATED_KEYS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new IMSException(e.getMessage());
+        }
+        return this.categoryID;
+    }
+
     static int getCatId(Statement stmt, String name) throws SQLException {
         String sql = String.format("SELECT cat_id FROM item_category WHERE cat_name = \'%s\';", name);
         ResultSet rs = stmt.executeQuery(sql);

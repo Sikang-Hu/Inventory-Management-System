@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 
 /**
  * Created by Sikang on 2019-07-25.
@@ -32,7 +33,6 @@ public class Item {
     void insertItem() {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
-            System.out.println(this.insertStmt(Category.getCatId(stmt, this.categoryName)));
             this.itemId = stmt.executeUpdate(this.insertStmt(Category.getCatId(stmt, this.categoryName))
                     , Statement.RETURN_GENERATED_KEYS);
         } catch (SQLException e) {
@@ -55,7 +55,7 @@ public class Item {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            throw new IMSException(e.getMessage());
         }
     }
 
@@ -72,6 +72,23 @@ public class Item {
                 ", itemName='" + itemName + '\'' +
                 ", itemPrice=" + itemPrice +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.itemId, this.categoryName, this.itemName, this.itemPrice);
+    }
+
+    // TODO: Definition of Item should be more clear
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Item) {
+            Item item = (Item) o;
+            return item.getItemId() == this.itemId || (item.getCategoryName().equals(this.categoryName)
+                    && item.getItemName().equals(this.itemName)
+                    && (Math.abs(item.getItemPrice() - this.itemPrice) < 0.01));
+        }
+        return false;
     }
 
 

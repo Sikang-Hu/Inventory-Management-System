@@ -58,6 +58,10 @@ class Command {
      */
     INSERT_ORDER("insert order ((?:\\S+)\\.odr)"),
 
+    GET_VENDOR("get vendor (?:(\\w+)|(?:\'([^']+)\'))"),
+
+    GET_SOLD_ITEM("get sold items (?:(\\w+)|(?:\'([^']+)\'))"),
+
     INSERT_SALE,
 
     INV_STATUS,

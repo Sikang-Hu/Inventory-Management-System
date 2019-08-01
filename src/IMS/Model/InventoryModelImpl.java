@@ -1,6 +1,7 @@
 package IMS.Model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +22,20 @@ public class InventoryModelImpl implements InventoryModel {
 
     }
 
+    // TODO: Will vendor have the same name
     @Override
     public List<Vendor> getVendor(String name) {
-        return null;
+        return Vendor.getVendor(name);
+    }
+
+    @Override
+    public HashSet<Item> getSoldItems(String name) {
+        List<Vendor> l = Vendor.getVendor(name);
+        HashSet<Item> result = new HashSet<>();
+        for (Vendor v : l) {
+            result.addAll(v.getItemList());
+        }
+        return result;
     }
 
     @Override

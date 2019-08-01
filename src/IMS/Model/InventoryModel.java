@@ -1,6 +1,7 @@
 package IMS.Model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ public interface InventoryModel {
   void insertVendor(String name, String address, String state, String zip, String description);
 
   List<Vendor> getVendor(String name);
+
+  HashSet<Item> getSoldItems(String name);
 
   void insertStore(String address, String state, int zipCode);
 
