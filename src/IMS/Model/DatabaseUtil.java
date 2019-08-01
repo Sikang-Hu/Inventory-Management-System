@@ -85,39 +85,5 @@ public class DatabaseUtil {
         return key;
     }
 
-    static List<Map<String, Object>> map(ResultSet rs) throws SQLException
-    {
-        List<Map<String, Object>> results = new ArrayList<>();
-        try
-        {
-            if (rs != null)
-            {
-                ResultSetMetaData meta = rs.getMetaData();
-                int numColumns = meta.getColumnCount();
-                while (rs.next())
-                {
-                    Map<String, Object> row = new HashMap<String, Object>();
-                    for (int i = 1; i <= numColumns; ++i)
-                    {
-                        String name = meta.getColumnName(i);
-                        Object value = rs.getObject(i);
-                        row.put(name, value);
-                    }
-                    results.add(row);
-                }
-            }
-        }
-        finally
-        {
-            close(rs);
-        }
-        return results;
-    }
-
-
-
-
-
-
 
 }

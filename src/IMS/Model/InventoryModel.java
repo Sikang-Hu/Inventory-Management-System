@@ -1,9 +1,6 @@
 package IMS.Model;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface InventoryModel {
 
@@ -11,24 +8,26 @@ public interface InventoryModel {
 
   Item getItem(String name);
 
-  void insertVendor(String name, String address, String state, String zip, String description);
+  void insertVendor(String name, String address, String state, int zip, String description);
 
   List<Vendor> getVendor(String name);
 
-  HashSet<Item> getSoldItems(String name);
+  Set<Item> getSoldItems(String name);
+
+  List<Status> getInvStatus();
 
   void insertStore(String address, String state, int zipCode);
 
-  List<RetailStore> getStores();
+  List<RetailStore> getStores(String name);
 
   int insertOrder(String vendor, Date date, List<Item> items);
 
   int insertSale(String customer, Date date, Map<String, Integer> items);
 
   // TODO: can same customer make several order in one day
-  List<SaleOrder> getSales(String customer, Date date);
+  List<Sale> getSales(String customer, Date date);
 
-  SaleOrder getSale(int saleID);
+  Sale getSale(int saleID);
 
   void insertCustomer(String name);
 

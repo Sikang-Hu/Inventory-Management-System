@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-// TODO: Should category be an enum?
+// TODO: Is there any usage of this class?
 public class Category {
     private int categoryID;
     private String categoryName;

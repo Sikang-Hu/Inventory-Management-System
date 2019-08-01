@@ -3,16 +3,14 @@ package IMS.Controller;
 import IMS.IMSException;
 import IMS.Model.InventoryModel;
 import IMS.Model.Item;
+import IMS.Model.Status;
 import IMS.Model.Vendor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ControllerImpl implements Controller {
@@ -63,11 +61,23 @@ public class ControllerImpl implements Controller {
 
     }
 
+    public void insertVendor(String... vendor) {
+        if (illegalArgs(5, vendor)) {
+            return;
+        }
+        try {
+            this.model.insertVendor(vendor[0], vendor[1], vendor[2], Integer.parseInt(vendor[3]), vendor[4]);
+        } catch (NumberFormatException e) {
+            throw new IMSException(e.getMessage());
+        }
+
+    }
+
     public void getSoldItem(String... vendor) {
         if (illegalArgs(1, vendor)) {
             return;
         }
-        HashSet<Item> set = this.model.getSoldItems(vendor[0]);
+        Set<Item> set = this.model.getSoldItems(vendor[0]);
         for (Item i : set) {
             this.appendTo(i.toString());
             this.appendTo("\n");
@@ -83,6 +93,16 @@ public class ControllerImpl implements Controller {
             this.appendTo(v.toString());
             this.appendTo("\n");
         }
+    }
+
+    // TODO: a individual class for INVENTORY STATUS?
+    public void getStatus(String... para) {
+        List<Status> list = this.model.getInvStatus();
+        for (Status s : list) {
+            this.appendTo(s.toString());
+            this.appendTo("\n");
+        }
+
     }
 
     public void insertOrder(String... path) {
@@ -144,11 +164,15 @@ public class ControllerImpl implements Controller {
     {
         commands.put(Command.Type.GET_ITEM, this::queryItem);
         commands.put(Command.Type.INSERT_ITEM, this::insertItem);
-        commands.put(Command.Type.INSERT_ORDER, this::insertOrder);
 
+
+        commands.put(Command.Type.INSERT_VENDOR, this::getVendor);
         commands.put(Command.Type.GET_VENDOR, this::getVendor);
         commands.put(Command.Type.GET_SOLD_ITEM, this::getSoldItem);
 
+        commands.put(Command.Type.INSERT_SALE, this::insertVendor);
+        commands.put(Command.Type.GET_SALE, this::insertVendor);
+        commands.put(Command.Type.STATUS, this::getStatus);
 
         commands.put(Command.Type.EXIT, i->System.exit(0));
         commands.put(Command.Type.QUIT, i->System.exit(1));

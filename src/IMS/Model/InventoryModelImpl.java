@@ -1,9 +1,10 @@
 package IMS.Model;
 
+import IMS.IMSException;
+
+import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 public class InventoryModelImpl implements InventoryModel {
     @Override
@@ -18,8 +19,9 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
-    public void insertVendor(String name, String address, String state, String zip, String description) {
-
+    public void insertVendor(String name, String address, String state, int zip, String description) {
+        Vendor v = new Vendor(name, address, state, zip, description);
+        v.insertVendor();
     }
 
     // TODO: Will vendor have the same name
@@ -29,7 +31,7 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
-    public HashSet<Item> getSoldItems(String name) {
+    public Set<Item> getSoldItems(String name) {
         List<Vendor> l = Vendor.getVendor(name);
         HashSet<Item> result = new HashSet<>();
         for (Vendor v : l) {
@@ -39,12 +41,33 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
+    public List<Status> getInvStatus() {
+        try (Connection con = DatabaseUtil.createConnection();
+             CallableStatement stmt = con.prepareCall("{CALL INV_STATUS(?, ?, ?)}")) {
+            stmt.setNull(1, Types.INTEGER);
+            stmt.setNull(2, Types.INTEGER);
+            stmt.setNull(3, Types.INTEGER);
+            ResultSet rs = stmt.executeQuery();
+            List<Status> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(new Status(rs.getString(2), rs.getString(4)
+                        , rs.getString(6), rs.getInt(7)));
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new IMSException(e.getMessage());
+        }
+    }
+
+
+
+    @Override
     public void insertStore(String address, String state, int zipCode) {
 
     }
 
     @Override
-    public List<RetailStore> getStores() {
+    public List<RetailStore> getStores(String name) {
         return null;
     }
 
@@ -59,12 +82,12 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
-    public List<SaleOrder> getSales(String customer, Date date) {
+    public List<Sale> getSales(String customer, Date date) {
         return null;
     }
 
     @Override
-    public SaleOrder getSale(int saleID) {
+    public Sale getSale(int saleID) {
         return null;
     }
 
