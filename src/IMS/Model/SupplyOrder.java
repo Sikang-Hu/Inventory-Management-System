@@ -73,7 +73,7 @@ public class SupplyOrder {
       DatabaseUtil.close(cstmt);
       DatabaseUtil.close(con);
     }
-    return order_id;
+    return key;
   }
 
   private String insertOrder() {
