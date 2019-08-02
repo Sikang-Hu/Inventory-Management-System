@@ -49,10 +49,10 @@ public class Category {
     int insertCat() {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
-            this.categoryID = stmt.executeUpdate(
-                    "INSERT INTO item_category (cat_name, cat_description) VALUES (\'"
+            stmt.executeUpdate("INSERT INTO item_category (cat_name, cat_description) VALUES (\'"
                             + this.categoryName + "\', \'"
                             + this.categoryDescription + "\');", Statement.RETURN_GENERATED_KEYS);
+            this.categoryID = DatabaseUtil.getGeneratedId(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new IMSException(e.getMessage());

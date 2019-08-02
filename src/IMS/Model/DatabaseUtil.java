@@ -85,5 +85,10 @@ public class DatabaseUtil {
         return key;
     }
 
+    static int getGeneratedId(Statement stmt) throws SQLException {
+        ResultSet rs = stmt.getGeneratedKeys();
+        return rs.next() ? rs.getInt(1) : -1;
+    }
+
 
 }

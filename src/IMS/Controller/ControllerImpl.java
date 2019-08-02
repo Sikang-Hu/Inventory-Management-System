@@ -1,10 +1,7 @@
 package IMS.Controller;
 
 import IMS.IMSException;
-import IMS.Model.InventoryModel;
-import IMS.Model.Item;
-import IMS.Model.Status;
-import IMS.Model.Vendor;
+import IMS.Model.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,11 +62,7 @@ public class ControllerImpl implements Controller {
         if (illegalArgs(5, vendor)) {
             return;
         }
-        try {
-            this.model.insertVendor(vendor[0], vendor[1], vendor[2], Integer.parseInt(vendor[3]), vendor[4]);
-        } catch (NumberFormatException e) {
-            throw new IMSException(e.getMessage());
-        }
+        this.model.insertVendor(vendor[0], vendor[1], vendor[2], Integer.parseInt(vendor[3]), vendor[4]);
 
     }
 
@@ -92,6 +85,23 @@ public class ControllerImpl implements Controller {
         for (Vendor v : vendors) {
             this.appendTo(v.toString());
             this.appendTo("\n");
+        }
+    }
+
+    public void insertStore(String... store) {
+        if (illegalArgs(3, store)) {
+            return;
+        }
+        this.model.insertStore(store[0], store[1], Integer.parseInt(store[2]));
+    }
+
+    public void getStore(String... store) {
+        if (illegalArgs(1, store)) {
+            return;
+        }
+        List<RetailStore> list = this.model.getStores(store[0]);
+        for (RetailStore r : list) {
+            this.appendTo(list.toString());
         }
     }
 
@@ -126,6 +136,9 @@ public class ControllerImpl implements Controller {
             } catch (IMSException ie) {
                 this.appendTo(ie.getMessage());
                 this.appendTo("\n");
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                this.appendTo(e.getMessage());
             }
         }
     }

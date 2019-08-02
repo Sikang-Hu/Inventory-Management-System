@@ -63,11 +63,12 @@ public class InventoryModelImpl implements InventoryModel {
 
     @Override
     public void insertStore(String address, String state, int zipCode) {
-
+        System.out.printf("%s, %s, %d", address, state, zipCode);
     }
 
     @Override
     public List<RetailStore> getStores(String name) {
+        System.out.println(name);
         return null;
     }
 
@@ -83,7 +84,7 @@ public class InventoryModelImpl implements InventoryModel {
 
     @Override
     public List<Sale> getSales(String customer, Date date) {
-        return null;
+        return  Sale.getSales(customer, date);
     }
 
     @Override

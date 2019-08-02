@@ -41,7 +41,8 @@ public class Vendor {
     void insertVendor() {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
-            this.vendorID = stmt.executeUpdate(this.insertStmt(), Statement.RETURN_GENERATED_KEYS);
+            stmt.executeUpdate(this.insertStmt(), Statement.RETURN_GENERATED_KEYS);
+            this.vendorID = DatabaseUtil.getGeneratedId(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new IMSException(e.getMessage());

@@ -1,13 +1,16 @@
 package IMS.Model;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class Sale {
+    private int sale_id;
     private Customer customer;
     private RetailStore store;
     private Date date;
@@ -19,6 +22,12 @@ public class Sale {
         this.items = items;
         this.store = store;
     }
+
+    static List<Sale> getSales(String customer, Date date) {
+        String sql = "SELECT sale_id, cus_id, store_id, ";
+        return null;
+    }
+
 
     public Customer getCustomer() {
         return this.customer;
@@ -44,7 +53,9 @@ public class Sale {
             connection = DatabaseUtil.createConnection();
              stmt = connection.createStatement();
             connection.setAutoCommit(false);
-            result = stmt.executeUpdate(this.insertStmt(), Statement.RETURN_GENERATED_KEYS);;
+            stmt.executeUpdate(this.insertStmt(), Statement.RETURN_GENERATED_KEYS);
+            result = DatabaseUtil.getGeneratedId(stmt);
+
             for (Item i : items.keySet()) {
                 stmt.executeUpdate(insertItem(i, result));
             }

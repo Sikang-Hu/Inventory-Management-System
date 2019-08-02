@@ -33,8 +33,9 @@ public class Item {
     void insertItem() {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
-            this.itemId = stmt.executeUpdate(this.insertStmt(Category.getCatId(stmt, this.categoryName))
+            stmt.executeUpdate(this.insertStmt(Category.getCatId(stmt, this.categoryName))
                     , Statement.RETURN_GENERATED_KEYS);
+            this.itemId = DatabaseUtil.getGeneratedId(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new IMSException(e.getMessage());
