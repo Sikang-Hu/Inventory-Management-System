@@ -48,15 +48,12 @@ public class SupplyOrder {
       if(rs.next()) {
         key = rs.getInt(1);
       }
-      System.out.println("order_id: "+ key);
 
       cstmt = con.prepareCall("{call INSERT_INTO_SKU(?,?,?,?)}");
       for (Map.Entry<Item, Integer> e : items.entrySet()) {
         int item_id = e.getKey().getItemId();
         double unit_cost = e.getKey().getItemPrice();
         int quantity = e.getValue();
-        System.out.println(String.format("order_id: %d, item_id: %d, quantity: %d", key, item_id, quantity)
-                + "cost: "+ unit_cost);
         cstmt.setInt(1, key);
         cstmt.setInt(2, item_id);
         cstmt.setInt(3, quantity);
