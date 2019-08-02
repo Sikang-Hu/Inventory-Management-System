@@ -12,6 +12,7 @@ public interface InventoryModel {
 
   List<Vendor> getVendor(String name);
 
+
   Set<Item> getSoldItems(String name);
 
   List<Status> getInvStatus();
@@ -21,6 +22,8 @@ public interface InventoryModel {
   List<RetailStore> getStores(String name);
 
   int insertOrder(String vendor, Date date, List<Item> items);
+  // TODO: Change Object Date to String date?
+  int insertOrder(String ven_name, int store_id, Date date, List<String> itemInfo);
 
   int insertSale(String customer, Date date, Map<String, Integer> items);
 

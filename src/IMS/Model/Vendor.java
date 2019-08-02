@@ -185,3 +185,4 @@ public class Vendor {
         this.vendorDescription = vendorDescription;
     }
 }
+

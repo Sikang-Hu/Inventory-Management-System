@@ -77,6 +77,39 @@ public class InventoryModelImpl implements InventoryModel {
         return 0;
     }
 
+  public int insertOrder(String ven_name, int store_id, Date date, List<String> itemInfo) {
+      // TODO: fix the list thing
+    Vendor vendor = Vendor.getVendor(ven_name).get(0);
+    RetailStore store = RetailStore.getStore(store_id);
+    Map<Item, Integer>items = processItemList(itemInfo);
+    SupplyOrder order = new SupplyOrder(vendor, store, date,items);
+    return order.insertSupplyOrder();
+  }
+
+  /**
+   * Helper function to prase the order info in to Map of item object and its quantity.
+   * @param itemInfo in the formate of “iteme_name, item_quantity, unit_cost”
+   * @return Map of Item Object and its quantity
+   */
+  public Map<Item, Integer> processItemList(List<String> itemInfo)
+          throws IllegalArgumentException {
+    Map<Item, Integer> result = new HashMap<>();
+    String item_name;
+    Double unit_cost;
+    int quantity;
+    for (String i : itemInfo) {
+      String[] i_array = i.split(",");
+      item_name = i_array[0];
+      unit_cost = Double.parseDouble(i_array[2]);
+      Item item = Item.getItem(item_name);
+      item.setItemPrice(unit_cost);
+
+      quantity = Integer.parseInt(i_array[1]);
+      result.put(item, quantity);
+    }
+    return result;
+  }
+
     @Override
     public int insertSale(String customer, Date date, Map<String, Integer> items) {
         return 0;

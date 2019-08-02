@@ -5,7 +5,8 @@ package IMS;
  */
 public class IMSException extends RuntimeException{
 
-    public IMSException() {}
+  public IMSException() {}
+
 
     public IMSException(String msg) {
         super(msg);
@@ -15,3 +16,4 @@ public class IMSException extends RuntimeException{
         super(String.format(format, objs));
     }
 }
+

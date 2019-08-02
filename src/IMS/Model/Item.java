@@ -121,7 +121,8 @@ public class Item {
         return itemPrice;
     }
 
-    public void setItemPrice(int itemPrice) {
+    public void setItemPrice(double itemPrice) {
         this.itemPrice = itemPrice;
     }
 }
+

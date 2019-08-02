@@ -10,9 +10,13 @@ import java.util.Map;
 
 public class DatabaseUtil {
 
-    private static String url = "jdbc:mysql://database-1.c6ltym5semvf.us-east-2.rds.amazonaws.com/ims";
-    private static String user = "admin";
-    private static String password = "cs5200proj";
+//  private static String url = "jdbc:mysql://database-1.c6ltym5semvf.us-east-2.rds.amazonaws.com/ims";
+//  private static String user = "admin";
+//  private static String password = "cs5200proj";
+
+    private static String url = "jdbc:mysql://localhost:3306/ims_sku?serverTimezone=EST5EDT";
+    private static String user = "weihan";
+    private static String password = "lwh@123456";
 
 
     public static Connection createConnection() throws SQLException {
@@ -92,3 +96,7 @@ public class DatabaseUtil {
 
 
 }
+
+
+
+
