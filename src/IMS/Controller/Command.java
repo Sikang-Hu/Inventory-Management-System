@@ -1,6 +1,6 @@
 package IMS.Controller;
+import IMS.IMSException;
 
-import IMS.Model.IMSException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -54,7 +54,7 @@ public class Vendor {
    * @param ven_name vendor name
    * @return vendor object
    */
-  public Vendor getVendor(String ven_name) {
+  public static Vendor getVendor(String ven_name) {
     try (Connection con = DatabaseUtil.createConnection();
          Statement stmt = con.createStatement()) {
       String getSql = "SELECT * FROM vendor WHERE ven_name = '"+ ven_name + "'";
