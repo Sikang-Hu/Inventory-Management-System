@@ -10,4 +10,8 @@ public class IMSException extends RuntimeException{
     public IMSException(String msg) {
         super(msg);
     }
+
+    public IMSException(String format, Object... objs) {
+        super(String.format(format, objs));
+    }
 }

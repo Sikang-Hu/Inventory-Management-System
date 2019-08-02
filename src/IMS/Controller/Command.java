@@ -1,6 +1,9 @@
 package IMS.Controller;
 
 import IMS.IMSException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +24,13 @@ class Command {
    */
   private String[] operands;
 
+  private static String stringArg = "(?:(\\w+)|(?:\'([^']+)\'))";
+
+  private static String doubleArg = "(-?\\d+(?:\\.\\d{0,2})?)";
+
+  private static String zipCode = "\"[0-9]{5}\"";
+
+
   /**
    * Construct a new command object with given type and arguments.
    *
@@ -39,15 +49,51 @@ class Command {
    */
   enum Type {
 
+
+
     /**
-     * Load command, the format should be {@code load <filepath>}.
+     * Insert command, which insert an entities to the database the format should be {
+     * @code insert <entities> <name> <cat> <unit price>}.
      */
-    ADD("add (\\s+)+");
+    INSERT_ITEM("insert item " + Command.stringArg + " " + Command.stringArg + " " +Command.doubleArg),
+
+    /**
+     * Get command, query a entities from the database the format should be {@code get <entities> <name>}.
+     */
+    GET_ITEM("get item " +  Command.stringArg),
+
+    INSERT_STORE("insert store " + Command.stringArg + " " + Command.stringArg + " " +Command.zipCode),
+
+    GET_STORE("get store " + Command.stringArg),
+
+    /**
+     *
+     */
+    INSERT_ORDER("insert order ((?:\\S+)\\.odr)"),
+
+    INSERT_VENDOR("insert vendor " + Command.stringArg + " " + Command.stringArg
+            + " " + Command.stringArg + " "+ "[0-9]{5}" + " " + Command.stringArg),
+
+    GET_VENDOR("get vendor " + Command.stringArg),
+
+    GET_SOLD_ITEM("get sold items " + Command.stringArg),
+
+    INSERT_SALE,
+
+    GET_SALE,
+
+    STATUS,
+    /**
+     * exit/quit the system.
+     */
+    QUIT,EXIT;
 
     /**
      * The pattern that commands of this type need to follow.
      */
     private Pattern pattern;
+
+
 
     /**
      * Construct a new Type that has no definition of format. The pattern will be its string value
@@ -81,11 +127,15 @@ class Command {
     for (Type t : Type.values()) {
       Matcher m = t.pattern.matcher(command);
       if (m.matches()) {
-        String[] operands = new String[m.groupCount()];
+        List<String> l = new ArrayList<>();
+        String temp;
         for (int i = 0; i < m.groupCount(); i++) {
-          operands[i] = m.group(i + 1);
+          temp = m.group(i + 1);
+          if (temp != null) {
+            l.add(temp);
+          }
         }
-        return new Command(t, operands);
+        return new Command(t, l.toArray(new String[0]));
       }
     }
     throw new IMSException("Invalid Input: " + command);

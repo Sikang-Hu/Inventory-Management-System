@@ -19,3 +19,17 @@ A course project of Database Management System
 - IMS.Controller.IMS.Controller Java
 - IMS.Model Java
 - View HTML, CSS, BootStrap, React, JavaScript
+
+## Dummy Model
+There is a dummy model which is a toy version of our final model. It has only one entity ORDER,
+which contains a bunch of ITEMS. An order can be initialized with a .odr file in below format:
+```
+<Supplier name>
+<Date>
+<name> <price>
+.
+.
+.
+```
+And this model maintain a file based database, "order.dbt", in which each line contains all the
+information for a single order.
