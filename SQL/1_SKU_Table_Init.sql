@@ -240,15 +240,15 @@ BEGIN
     END IF;
 
     # making sure the remain of this sku stack is enough for the current sale quantity
-    SELECT sku.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity))
+    SELECT SKU.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity))
     INTO remain
     FROM supply_order so
              JOIN SKU ON so.order_id = SKU.order_id
-             LEFT JOIN sale_has_SKU shS on SKU.SKU_id = shS.SKU_id
+             LEFT JOIN sale_has_SKU shs on SKU.SKU_id = shs.SKU_id
     WHERE so.delivery_date IS NOT NULL      # making sure the sku is actually delivered
       AND cur_sale_date >= so.delivery_date # todo: verify this
 
-      AND sku.SKU_id = NEW.SKU_id;
+      AND SKU.SKU_id = NEW.SKU_id;
 
     IF NEW.sale_quantity > remain THEN
         SELECT CONCAT('This stack of SKU id=', NEW.SKU_id, ' does not have enough items to sell. Selling ',
@@ -283,7 +283,7 @@ BEGIN
     INTO sold
     FROM supply_order so
              JOIN SKU on SKU.order_id = so.order_id
-             LEFT JOIN sale_has_SKU shS on SKU.SKU_id = shS.SKU_id
+             LEFT JOIN sale_has_SKU shs on SKU.SKU_id = shs.SKU_id
     WHERE SKU.item_id = input_item_id
       AND so.store_id = input_store_id
       AND so.delivery_date IS NOT NULL;
@@ -332,10 +332,10 @@ BEGIN
     DROP TEMPORARY TABLE IF EXISTS fifo_stack;
     CREATE TEMPORARY TABLE IF NOT EXISTS fifo_stack
     SELECT SKU.SKU_id,
-           sku.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity)) AS remain
+           SKU.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity)) AS remain
     FROM supply_order so
              JOIN SKU on SKU.order_id = so.order_id
-             LEFT JOIN sale_has_SKU shS on SKU.SKU_id = shS.SKU_id
+             LEFT JOIN sale_has_SKU shs on SKU.SKU_id = shs.SKU_id
     WHERE SKU.item_id = input_item_id
       AND so.store_id = cur_store_id
       AND so.delivery_date IS NOT NULL # making sure the selected fifo sku are delivered
