@@ -92,31 +92,31 @@ CREATE TABLE IF NOT EXISTS sale
 );
 
 
-DROP TABLE IF EXISTS SKU;
-CREATE TABLE IF NOT EXISTS SKU
+DROP TABLE IF EXISTS sku;
+CREATE TABLE IF NOT EXISTS sku
 (
-    SKU_id         INT AUTO_INCREMENT UNIQUE,
+    sku_id         INT AUTO_INCREMENT UNIQUE,
     order_id       INT NOT NULL,
     item_id        INT NOT NULL,
     order_quantity INT NOT NULL,
     unit_cost      DECIMAL(8, 2),
 
-    PRIMARY KEY (SKU_id, order_id, item_id),
-    CONSTRAINT SKU_FK_order FOREIGN KEY (order_id) REFERENCES supply_order (order_id),
-    CONSTRAINT SKU_FK_item FOREIGN KEY (item_id) REFERENCES item (item_id)
+    PRIMARY KEY (sku_id, order_id, item_id),
+    CONSTRAINT sku_FK_order FOREIGN KEY (order_id) REFERENCES supply_order (order_id),
+    CONSTRAINT sku_FK_item FOREIGN KEY (item_id) REFERENCES item (item_id)
 );
 
-DROP TABLE IF EXISTS sale_has_SKU;
-CREATE TABLE IF NOT EXISTS sale_has_SKU
+DROP TABLE IF EXISTS sale_has_sku;
+CREATE TABLE IF NOT EXISTS sale_has_sku
 (
     sale_id         INT           NOT NULL,
-    SKU_id          INT           NOT NULL,
+    sku_id          INT           NOT NULL,
     sale_quantity   INT           NOT NULL,
     unit_sale_price DECIMAL(8, 2) NOT NULL,
 
-#     PRIMARY KEY (sale_id, SKU_id), # in order to have return entry this should be blocked
+#     PRIMARY KEY (sale_id, sku_id), # in order to have return entry this should be blocked
     CONSTRAINT si_fk_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id),
-    CONSTRAINT si_fk_SKU FOREIGN KEY (SKU_id) REFERENCES SKU (SKU_id)
+    CONSTRAINT si_fk_sku FOREIGN KEY (sku_id) REFERENCES sku (sku_id)
 );
 
 # making sure the vendor has the item available for sell
@@ -124,7 +124,7 @@ DROP TRIGGER IF EXISTS verify_vhi_for_sku_insertion;
 DELIMITER //
 CREATE TRIGGER verify_vhi_for_sku_insertion
     BEFORE INSERT
-    ON SKU
+    ON sku
     FOR EACH ROW
 BEGIN
     DECLARE message VARCHAR(255);
@@ -171,8 +171,8 @@ BEGIN
 END//
 DELIMITER ;
 
--- SKU Insertion Procedure ## AUTO_INCREMENT ID
-# Insert into SKU table procedure.
+-- sku Insertion Procedure ## AUTO_INCREMENT ID
+# Insert into sku table procedure.
 DROP PROCEDURE IF EXISTS insert_into_sku;
 DELIMITER //
 CREATE PROCEDURE insert_into_sku(IN input_order_id INT, # TODO: JAVA need to provide the order_id
@@ -180,7 +180,7 @@ CREATE PROCEDURE insert_into_sku(IN input_order_id INT, # TODO: JAVA need to pro
                                  IN input_order_quantity INT,
                                  IN input_unit_cost DECIMAL(8, 2))
 BEGIN
-    INSERT INTO SKU (order_id, item_id, order_quantity, unit_cost)
+    INSERT INTO sku (order_id, item_id, order_quantity, unit_cost)
     VALUES (input_order_id, input_item_id, input_order_quantity, input_unit_cost);
 END//
 DELIMITER ;
@@ -212,14 +212,14 @@ END//
 DELIMITER ;
 
 
--- Sale_has_SKU Insertion Trigger
+-- Sale_has_sku Insertion Trigger
 # this trigger is a double check
 # it's not needed when procedure is called when inserting on shs
 DROP TRIGGER IF EXISTS verify_sku_remain_for_shs_insertion;
 DELIMITER //
 CREATE TRIGGER verify_sku_remain_for_shs_insertion
     BEFORE INSERT
-    ON sale_has_SKU
+    ON sale_has_sku
     FOR EACH ROW
 BEGIN
     DECLARE message VARCHAR(255); -- The error message
@@ -227,31 +227,31 @@ BEGIN
     DECLARE cur_store_id INT;
     DECLARE cur_sale_date DATE;
 
-    # making sure the SKU is actually in the store where the sale is made
+    # making sure the sku is actually in the store where the sale is made
     SELECT store_id, sale_date INTO cur_store_id, cur_sale_date FROM sale WHERE sale.sale_id = NEW.sale_id;
-    IF NEW.SKU_id NOT IN (SELECT SKU_id
-                          FROM SKU
-                                   JOIN supply_order s on SKU.order_id = s.order_id
+    IF NEW.sku_id NOT IN (SELECT sku_id
+                          FROM sku
+                                   JOIN supply_order s on sku.order_id = s.order_id
                           WHERE s.store_id = cur_store_id) THEN
-        SELECT CONCAT('This stack of NEW.SKU id=', NEW.SKU_id, ' does not belong to the store id=', cur_store_id,
+        SELECT CONCAT('This stack of NEW.sku id=', NEW.sku_id, ' does not belong to the store id=', cur_store_id,
                       ' associated with the NEW.Sale id=', NEW.sale_id)
         INTO message;
         SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = message;
     END IF;
 
     # making sure the remain of this sku stack is enough for the current sale quantity
-    SELECT SKU.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity))
+    SELECT sku.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity))
     INTO remain
     FROM supply_order so
-             JOIN SKU ON so.order_id = SKU.order_id
-             LEFT JOIN sale_has_SKU shs on SKU.SKU_id = shs.SKU_id
+             JOIN sku ON so.order_id = sku.order_id
+             LEFT JOIN sale_has_sku shs on sku.sku_id = shs.sku_id
     WHERE so.delivery_date IS NOT NULL      # making sure the sku is actually delivered
       AND cur_sale_date >= so.delivery_date # todo: verify this
 
-      AND SKU.SKU_id = NEW.SKU_id;
+      AND sku.sku_id = NEW.sku_id;
 
     IF NEW.sale_quantity > remain THEN
-        SELECT CONCAT('This stack of SKU id=', NEW.SKU_id, ' does not have enough items to sell. Selling ',
+        SELECT CONCAT('This stack of sku id=', NEW.sku_id, ' does not have enough items to sell. Selling ',
                       NEW.sale_quantity, ' but only found ', remain)
         INTO message;
         SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = message;
@@ -271,20 +271,20 @@ BEGIN
     DECLARE total INT;
     DECLARE sold INT;
 
-    SELECT SUM(SKU.order_quantity)
+    SELECT SUM(sku.order_quantity)
     INTO total
     FROM supply_order so
-             JOIN SKU on SKU.order_id = so.order_id
-    WHERE SKU.item_id = input_item_id
+             JOIN sku on sku.order_id = so.order_id
+    WHERE sku.item_id = input_item_id
       AND so.store_id = input_store_id
       AND so.delivery_date IS NOT NULL;
 
     SELECT SUM(shs.sale_quantity)
     INTO sold
     FROM supply_order so
-             JOIN SKU on SKU.order_id = so.order_id
-             LEFT JOIN sale_has_SKU shs on SKU.SKU_id = shs.SKU_id
-    WHERE SKU.item_id = input_item_id
+             JOIN sku on sku.order_id = so.order_id
+             LEFT JOIN sale_has_sku shs on sku.sku_id = shs.sku_id
+    WHERE sku.item_id = input_item_id
       AND so.store_id = input_store_id
       AND so.delivery_date IS NOT NULL;
 
@@ -295,18 +295,18 @@ BEGIN
 END//
 DELIMITER ;
 
--- Sale_has_SKU Insertion Procedure
+-- Sale_has_sku Insertion Procedure
 # the logical for insertion on SHS is complicated.
 # TODO: the Java provides sale_id, item_id (INSTEAD OF sku_id), quantity, and price.
 # the procedure get all sku with item_id in the store related to sale_id and order them by their delivery_date.
 # the procedure then write off every sku_id with sale_id until sale_quantity reaches to 0.
 # this procedure checks if quantity remain for all sku_id is enough for sale_quantity.
-# VERIFY_SKU_REMAIN_FOR_SHS_INSERTION trigger ONLY checks if the sale_quantity is good for CURRENT sku stack and
+# VERIFY_sku_REMAIN_FOR_SHS_INSERTION trigger ONLY checks if the sale_quantity is good for CURRENT sku stack and
 # this check will be handled in fifo_stack while loop.
 DROP PROCEDURE IF EXISTS insert_into_sale_has_sku;
 DELIMITER //
 CREATE PROCEDURE insert_into_sale_has_sku(IN input_sale_id INT,
-                                          IN input_item_id INT, # NOT SKU_ID!!!!
+                                          IN input_item_id INT, # NOT sku_ID!!!!
                                           IN input_sale_quantity INT, #TODO: validate input
                                           IN input_unit_sale_price DECIMAL(8, 2))
 BEGIN
@@ -331,33 +331,33 @@ BEGIN
     # get all sku for input_item in the sale related store
     DROP TEMPORARY TABLE IF EXISTS fifo_stack;
     CREATE TEMPORARY TABLE IF NOT EXISTS fifo_stack
-    SELECT SKU.SKU_id,
-           SKU.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity)) AS remain
+    SELECT sku.sku_id,
+           sku.order_quantity - IF(SUM(shs.sale_quantity) IS NULL, 0, SUM(shs.sale_quantity)) AS remain
     FROM supply_order so
-             JOIN SKU on SKU.order_id = so.order_id
-             LEFT JOIN sale_has_SKU shs on SKU.SKU_id = shs.SKU_id
-    WHERE SKU.item_id = input_item_id
+             JOIN sku on sku.order_id = so.order_id
+             LEFT JOIN sale_has_sku shs on sku.sku_id = shs.sku_id
+    WHERE sku.item_id = input_item_id
       AND so.store_id = cur_store_id
       AND so.delivery_date IS NOT NULL # making sure the selected fifo sku are delivered
 #       AND (SELECT sale_date FROM sale WHERE sale_id = input_sale_id) >= so.delivery_date # todo: verify this
-    GROUP BY so.delivery_date, SKU.SKU_id
+    GROUP BY so.delivery_date, sku.sku_id
     HAVING remain > 0
     ORDER BY so.delivery_date;
 
     # as long as the sale quantity hasn't reached 0, keep looping
     WHILE stack_quantity > 0 DO
     # since the quantity check has been completed, the stack will not go out of bound
-    SELECT SKU_id, remain INTO stack_sku, stack_remain FROM fifo_stack LIMIT 1;
+    SELECT sku_id, remain INTO stack_sku, stack_remain FROM fifo_stack LIMIT 1;
 
     IF stack_quantity > stack_remain THEN
         # if remaining sale quantity is greater than current remain on this stack,
         # insert shs with current stack remain and update remaining sale quantity.
-        INSERT INTO sale_has_SKU VALUES (input_sale_id, stack_sku, stack_remain, input_unit_sale_price);
+        INSERT INTO sale_has_sku VALUES (input_sale_id, stack_sku, stack_remain, input_unit_sale_price);
         SET stack_quantity = stack_quantity - stack_remain;
     ELSE
         # if remaining sale quantity is less than current stack remain,
         # insert shs with sale quantity and set it to 0, end the loop.
-        INSERT INTO sale_has_SKU VALUES (input_sale_id, stack_sku, stack_quantity, input_unit_sale_price);
+        INSERT INTO sale_has_sku VALUES (input_sale_id, stack_sku, stack_quantity, input_unit_sale_price);
         SET stack_quantity = 0;
     END IF;
 

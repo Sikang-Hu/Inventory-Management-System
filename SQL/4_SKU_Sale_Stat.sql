@@ -14,13 +14,13 @@ BEGIN
            i.item_id,
            i.item_name,
            YEARWEEK(sale.sale_date)                     AS year_week,
-           SUM(shS.sale_quantity * shS.unit_sale_price) AS sale_amt
+           SUM(shs.sale_quantity * shs.unit_sale_price) AS sale_amt
     FROM retail_store rs
              JOIN supply_order so on rs.store_id = so.store_id
-             JOIN SKU S on so.order_id = S.order_id
+             JOIN sku S on so.order_id = S.order_id
              JOIN item i on S.item_id = i.item_id
-             JOIN sale_has_SKU shS on S.SKU_id = shS.SKU_id
-             JOIN sale on shS.sale_id = sale.sale_id
+             JOIN sale_has_sku shs on S.sku_id = shs.sku_id
+             JOIN sale on shs.sale_id = sale.sale_id
     WHERE 1 = 1 # a delivery_date check is unnecessary since no sale can be inserted if not delivered
       AND (
         CASE

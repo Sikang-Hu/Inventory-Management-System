@@ -11,8 +11,8 @@ BEGIN
            i.item_name,
            ROUND(AVG(DATEDIFF(so.delivery_date, so.order_date)), 0) AS avg_lead_date
     FROM item i
-             JOIN SKU ON i.item_id = SKU.item_id
-             JOIN supply_order so ON SKU.order_id = so.order_id
+             JOIN sku ON i.item_id = sku.item_id
+             JOIN supply_order so ON sku.order_id = so.order_id
              JOIN vendor v ON so.ven_id = v.ven_id
     WHERE so.delivery_date IS NOT NULL
       AND (

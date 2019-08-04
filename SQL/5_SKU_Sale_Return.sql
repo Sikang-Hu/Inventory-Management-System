@@ -20,10 +20,10 @@ BEGIN
 
     DROP TEMPORARY TABLE IF EXISTS sale_fifo_stack;
     CREATE TEMPORARY TABLE IF NOT EXISTS sale_fifo_stack
-    SELECT S.SKU_id, S.order_quantity, S.unit_cost, shS.sale_quantity, shS.unit_sale_price
+    SELECT S.sku_id, S.order_quantity, S.unit_cost, shs.sale_quantity, shs.unit_sale_price
     FROM sale
-             JOIN sale_has_SKU shS on sale.sale_id = shS.sale_id
-             JOIN SKU S on shS.SKU_id = S.SKU_id
+             JOIN sale_has_sku shs on sale.sale_id = shs.sale_id
+             JOIN sku S on shs.sku_id = S.sku_id
              JOIN supply_order so on S.order_id = so.order_id
     WHERE sale.sale_id = input_sale_id
       AND S.item_id = input_item_id
@@ -42,16 +42,16 @@ BEGIN
     SET stack_quantity = input_quantity;
 
     WHILE stack_quantity > 0 DO
-    SELECT SKU_id, sale_quantity, unit_sale_price
+    SELECT sku_id, sale_quantity, unit_sale_price
     INTO stack_sku, stack_remain,stack_sale_price
     FROM sale_fifo_stack
     LIMIT 1;
 
     IF stack_quantity > stack_remain THEN
-        INSERT INTO sale_has_SKU VALUES (input_sale_id, stack_sku, 0 - stack_remain, stack_sale_price);
+        INSERT INTO sale_has_sku VALUES (input_sale_id, stack_sku, 0 - stack_remain, stack_sale_price);
         SET stack_quantity = stack_quantity - stack_remain;
     ELSE
-        INSERT INTO sale_has_SKU VALUES (input_sale_id, stack_sku, 0 - stack_quantity, stack_sale_price);
+        INSERT INTO sale_has_sku VALUES (input_sale_id, stack_sku, 0 - stack_quantity, stack_sale_price);
         SET stack_quantity = 0;
     END IF;
 
@@ -62,12 +62,12 @@ END//
 DELIMITER ;
 
 select *
-from SKU
-         join supply_order so on SKU.order_id = so.order_id;
+from sku
+         join supply_order so on sku.order_id = so.order_id;
 
 select *
-from sale_has_SKU
-         join sale s on sale_has_SKU.sale_id = s.sale_id;
+from sale_has_sku
+         join sale s on sale_has_sku.sale_id = s.sale_id;
 
 call get_inventory_status_by_item(null, null, null);
 call get_inventory_status_by_sku(null, null);

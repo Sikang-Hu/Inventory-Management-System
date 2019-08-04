@@ -55,9 +55,9 @@ VALUES (1, 1, 1, '2019-05-26', '2019-06-07'),
        (5, 1, 2, '2019-07-05', '2019-07-29');
 
 
-TRUNCATE TABLE SKU;
+TRUNCATE TABLE sku;
 # TODO: should use insert_into_sku(order_id, item_id, order_quantity, unit_cost)
-INSERT INTO SKU # skuid, orderid, itemid
+INSERT INTO sku # skuid, orderid, itemid
 VALUES (1, 1, 1, 50, 0.2),
        (2, 1, 2, 50, 1.1),
        (3, 2, 1, 100, 0.15),
@@ -85,16 +85,16 @@ VALUES (1, 1, 1, '2019-06-11'),
        (3, 1, 2, '2019-06-11'),
        (4, 1, 4, '2019-07-11');
 
-TRUNCATE TABLE sale_has_SKU;
+TRUNCATE TABLE sale_has_sku;
 # TODO: MUST USE insert_into_sale_has_sku(sale_id, item_id, sale_quantity, unit_sale_price)
 CALL insert_into_sale_has_sku(1, 1, 20, 0.3);
 CALL insert_into_sale_has_sku(2, 1, 50, 0.35);
 CALL insert_into_sale_has_sku(3, 1, 20, 0.3);
 
 SELECT *
-FROM sale_has_SKU;
+FROM sale_has_sku;
 # Should be exactly the same as
-# INSERT INTO sale_has_SKU
+# INSERT INTO sale_has_sku
 # VALUES (1, 1, 20, 0.3),
 #        (2, 1, 30, 0.35),
 #        (2, 3, 20, 0.35),
