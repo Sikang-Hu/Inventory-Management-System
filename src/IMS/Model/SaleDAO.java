@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,18 +47,27 @@ public class SaleDAO {
 
         try {
             con = DatabaseUtil.createConnection();
-            cstmt = con.prepareCall("{call INSERT_INTO_SALE(?,?,?,?)}");
+            cstmt = con.prepareCall("{call INSERT_INTO_SALE(?,?,?,?,?)}");
             con.setAutoCommit(false);
+
+
             cstmt.setInt(1, sale.getStore_id());
-            cstmt.setDate(2, (java.sql.Date) sale.getSaleDate());
-            cstmt.setInt(3, sale.getCustomer_id());
-            cstmt.setString(4, cus_name);
-            cstmt.execute();
-            ResultSet rs = cstmt.getResultSet();
-            if (rs.next()) {
-                key = rs.getInt(1);
+            java.sql.Date saleDate = new java.sql.Date(sale.getSaleDate().getTime());
+            cstmt.setDate(2, saleDate);
+            Integer saleID = sale.getCustomer_id();
+            if (saleID == null) {
+                cstmt.setNull(3, Types.INTEGER);
+
+            } else {
+                cstmt.setInt(3, saleID);
             }
-            cstmt1 = con.prepareCall("{call INSERT_INTO_SALE_HAS_SQL(?,?,?,?)}");
+            cstmt.setString(4, cus_name);
+            cstmt.registerOutParameter(5, Types.INTEGER);
+
+            cstmt.execute();
+            key = cstmt.getInt(5);
+
+            cstmt1 = con.prepareCall("{call INSERT_INTO_SALE_HAS_SKU(?,?,?,?)}");
             for (ItemInTransaction i : items) {
                 int item_id = i.getItem_id();
                 double unit_cost = i.getUnit_cost();

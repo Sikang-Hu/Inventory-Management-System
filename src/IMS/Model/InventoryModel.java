@@ -1,22 +1,35 @@
 package IMS.Model;
 
-import java.util.*;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public interface InventoryModel {
   //Category related
   void insertCategory(String categoryName, String categoryDescription);
 
+  CategoryDTO getCatByName(String cat_name);
+
+  CategoryDTO getCatByName(int cat_name);
+
   //Item related
   void insertItem(String name, String category, double unitPrice);
 
-  Item getItem(String name);
+  ItemDTO getItemByName(String name);
+
+  ItemDTO getItemByID(int id);
 
   //Vendor related
   void insertVendor(String name, String address, String state, int zip, String description);
 
-  Vendor getVendor(String name);
+  VendorDTO getVendorByName(String name);
 
-  Set<Item> getSoldItems(String name);
+  VendorDTO getVendorByID(int id);
+
+  Set<ItemDTO> getSoldItems(String name);
+
+  void addSoldItem(String vendorName, List<String> itemInfo);
 
   //Status related
   List<Status> getInvStatus();
@@ -24,7 +37,9 @@ public interface InventoryModel {
   //store related
   void insertStore(String address, String state, int zipCode);
 
-  RetailStore getStores(int storeID);
+  RetailStoreDTO getStoresByID(int storeID);
+
+  RetailStoreDTO getStoresByName(String store_name);
 
   //SupplyOrder related
   int insertOrder(String ven_name, int store_id, Date date, List<String> itemInfo);
@@ -40,7 +55,7 @@ public interface InventoryModel {
   void updateDeliveryDate(int order_id);
 
   //Sale related
-  int insertSale(int cus_id, String cus_name, int store_id, Date date, List<String> itemInfo);
+  int insertSale(Integer cus_id, String cus_name, int store_id, Date date, List<String> itemInfo);
 
   List<ItemInTransaction> getSaleItems(int sale_id);
 

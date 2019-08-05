@@ -105,7 +105,8 @@ public class SupplyOrderDAO {
   public List<SupplyOrderDTO> getOrdersByVen_Date(int ven_id, Date orderDate) {
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     String date = df.format(orderDate);
-    String sql = "SELECT * FROM supply_order WHERE ven_id = " + ven_id + "and order_date = ''" + date + "''";
+    String sql = "SELECT * FROM supply_order WHERE ven_id = " + ven_id + " and order_date = '" + date + "'";
+    System.out.println(sql);
     return filterOrders(sql);
   }
 
@@ -113,7 +114,7 @@ public class SupplyOrderDAO {
   public List<SupplyOrderDTO> getOrdersByStore_Date(int store_id, Date orderDate) {
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     String date = df.format(orderDate);
-    String sql = "SELECT * FROM supply_order WHERE store_id = " + store_id + "and order_date = ''" + date + "''";
+    String sql = "SELECT * FROM supply_order WHERE store_id = " + store_id + " and order_date = '" + date + "'";
     return filterOrders(sql);
   }
 
