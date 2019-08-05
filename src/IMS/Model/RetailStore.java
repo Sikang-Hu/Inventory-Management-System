@@ -30,6 +30,20 @@ public class RetailStore {
     this.storeZip = storeZip;
   }
 
+  public void insertStore() {
+    try (Connection con = DatabaseUtil.createConnection();
+         Statement stmt = con.createStatement()) {
+      String sql = "INSERT INTO retail_store (store_address, store_state, store_zip) VALUES ('"
+              + this.storeAddress+"', '"+this.StoreState+"', " + this.storeZip + ")";
+      stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+      this.storeId = DatabaseUtil.getGeneratedId(stmt);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      throw new IMSException(e.getMessage());
+    }
+  }
+
+
   public static RetailStore getStore(int store_id) {
     try (Connection con = DatabaseUtil.createConnection();
          Statement stmt = con.createStatement()) {

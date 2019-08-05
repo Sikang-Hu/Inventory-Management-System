@@ -1,12 +1,12 @@
 package IMS.Model;
 
-public class ItemInOrder {
+public class ItemInTransaction {
 
     private int item_id;
     private int order_quantity;
     private double unit_cost;
 
-    public ItemInOrder(int item_id, int order_quantity, double unit_cost) {
+    public ItemInTransaction(int item_id, int order_quantity, double unit_cost) {
         this.item_id = item_id;
         this.order_quantity = order_quantity;
         this.unit_cost = unit_cost;

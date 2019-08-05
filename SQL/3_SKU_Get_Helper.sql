@@ -51,6 +51,6 @@ CALL get_sales_by_cus_name('rod johnson', null);
 CALL get_sales_by_cus_name(null, '20190711');
 
 # (vendor_name NOT NULL, order_date) NOT delivery_date
-CALL get_orders_by_ven_name(null, null); # error
+CALL get_orders_by_ven_name(null, null); # THIS WILL FAIL
 CALL get_orders_by_ven_name('Ward, Shields and Oberbrunner', null);
 CALL get_orders_by_ven_name('Olson, Mayert and Kessler', '20190626');

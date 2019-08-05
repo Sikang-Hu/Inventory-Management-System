@@ -24,20 +24,20 @@ BEGIN
                  i.item_name,
                  ic.cat_id,
                  ic.cat_name,
-                 SUM(SKU.order_quantity) AS bought
+                 SUM(sku.order_quantity) AS bought
           FROM retail_store rs
                    JOIN supply_order so ON rs.store_id = so.store_id
-                   JOIN SKU on SKU.order_id = so.order_id
-                   JOIN item i on SKU.item_id = i.item_id
+                   JOIN sku on sku.order_id = so.order_id
+                   JOIN item i on sku.item_id = i.item_id
                    JOIN item_category ic on i.cat_id = ic.cat_id
           WHERE so.delivery_date IS NOT NULL
           GROUP BY rs.store_id, rs.store_address, i.item_id, i.item_name) AS supply
              LEFT JOIN
-         (SELECT i.item_id, s.store_id, SUM(shS.sale_quantity) as sold
+         (SELECT i.item_id, s.store_id, SUM(shs.sale_quantity) as sold
           FROM item i
-                   JOIN SKU ON i.item_id = SKU.item_id
-                   JOIN sale_has_SKU shS ON SKU.SKU_id = shS.SKU_id
-                   JOIN sale s on shS.sale_id = s.sale_id
+                   JOIN sku ON i.item_id = sku.item_id
+                   JOIN sale_has_sku shs ON sku.sku_id = shs.sku_id
+                   JOIN sale s on shs.sale_id = s.sale_id
           GROUP BY i.item_id, s.store_id) AS sale
          ON (supply.item_id = sale.item_id AND supply.store_id = sale.store_id)
     WHERE 1 = 1
@@ -72,7 +72,7 @@ DELIMITER //
 CREATE PROCEDURE get_inventory_status_by_sku(IN input_store_id INT,
                                              IN input_item_id INT)
 BEGIN
-    SELECT bought.SKU_id,
+    SELECT bought.sku_id,
            bought.store_id,
            bought.store_address,
            bought.item_id,
@@ -80,25 +80,25 @@ BEGIN
            bought.unit_cost,
            bought.order_quantity,
            bought.order_quantity - IF(sold.num IS NULL, 0, sold.num) AS remain
-    FROM (SELECT SKU.SKU_id,
-                 SKU.order_quantity,
-                 SKU.unit_cost,
+    FROM (SELECT sku.sku_id,
+                 sku.order_quantity,
+                 sku.unit_cost,
                  rs.store_id,
                  rs.store_address,
                  i.item_id,
                  i.item_name
           FROM retail_store rs
                    JOIN supply_order so ON rs.store_id = so.store_id
-                   JOIN SKU ON so.order_id = SKU.order_id
-                   JOIN item i ON SKU.item_id = i.item_id
+                   JOIN sku ON so.order_id = sku.order_id
+                   JOIN item i ON sku.item_id = i.item_id
           WHERE so.delivery_date IS NOT NULL
          ) AS bought
              LEFT JOIN
-         (SELECT SKU.SKU_id, SUM(shS.sale_quantity) AS num
-          FROM SKU
-                   JOIN sale_has_SKU shS ON SKU.SKU_id = shS.SKU_id
-          GROUP BY SKU.SKU_id
-         ) AS sold ON (bought.SKU_id = sold.SKU_id)
+         (SELECT sku.sku_id, SUM(shs.sale_quantity) AS num
+          FROM sku
+                   JOIN sale_has_sku shs ON sku.sku_id = shs.sku_id
+          GROUP BY sku.sku_id
+         ) AS sold ON (bought.sku_id = sold.sku_id)
     WHERE 1 = 1
       AND (
         CASE # set condition for store_id

@@ -49,20 +49,17 @@ public class Vendor {
         }
     }
 
-    static List<Vendor> getVendor(String name) {
+    static Vendor getVendor(String name) {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
-            List<Vendor> result = new ArrayList<>();
             String sql = String.format("SELECT * FROM vendor WHERE ven_name = \'%s\';", name);
             ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                result.add(new Vendor(rs.getInt(1), rs.getString(2), rs.getString(3),
-                        rs.getString(4), rs.getInt(5), rs.getString(6)));
+            if (rs.next()) {
+                return new Vendor(rs.getInt(1), rs.getString(2), rs.getString(3),
+                        rs.getString(4), rs.getInt(5), rs.getString(6));
             }
-            if (result.isEmpty()) {
+             else {
                 throw new IMSException("Vendor: %s doesn't exist", name);
-            } else {
-                return result;
             }
         } catch (SQLException e) {
             e.printStackTrace();
