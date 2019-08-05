@@ -3,20 +3,17 @@ package IMS.Model;
 import IMS.IMSException;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 public class DatabaseUtil {
 
-  private static String url = "jdbc:mysql://database-1.c6ltym5semvf.us-east-2.rds.amazonaws.com/ims_SKU";
-  private static String user = "admin";
-  private static String password = "cs5200proj";
+//  private static String url = "jdbc:mysql://database-1.c6ltym5semvf.us-east-2.rds.amazonaws.com/ims_SKU";
+//  private static String user = "admin";
+//  private static String password = "cs5200proj";
 
-//    private static String url = "jdbc:mysql://localhost:3306/ims_sku?serverTimezone=EST5EDT";
-//    private static String user = "weihan";
-//    private static String password = "lwh@123456";
+    private static String url = "jdbc:mysql://localhost:3306/ims_sku?serverTimezone=EST5EDT";
+    private static String user = "weihan";
+    private static String password = "lwh@123456";
 
 
     public static Connection createConnection() throws SQLException {
@@ -63,30 +60,15 @@ public class DatabaseUtil {
         }
     }
 
-    static int insertOneRecord (String insertSQL)
-    {
-        // System.out.println("INSERT STATEMENT: "+insertSQL);
-        int key = -1;
-        try (Connection con = createConnection()) {
-
-            // get connection and initialize statement
-
-            Statement stmt = con.createStatement();
+    static int insertOneRecord (String insertSQL) {
+        try (Connection con = DatabaseUtil.createConnection();
+             Statement stmt = con.createStatement()) {
             stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
-
-            // extract auto-incremented ID
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) key = rs.getInt(1);
-
-            // Cleanup
-            stmt.close();
-
+        return DatabaseUtil.getGeneratedId(stmt);
         } catch (SQLException e) {
-            System.err.println("ERROR: Could not insert record: "+insertSQL);
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+        e.printStackTrace();
+        throw new IMSException(e.getMessage());
         }
-        return key;
     }
 
     static int getGeneratedId(Statement stmt) throws SQLException {

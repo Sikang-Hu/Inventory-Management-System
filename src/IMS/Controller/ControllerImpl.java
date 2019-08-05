@@ -53,7 +53,7 @@ public class ControllerImpl implements Controller {
             return;
         }
 
-        Item i = this.model.getItem(name[0]);
+        ItemDTO i = this.model.getItemByName(name[0]);
         this.appendTo(i.toString());
 
     }
@@ -70,8 +70,8 @@ public class ControllerImpl implements Controller {
         if (illegalArgs(1, vendor)) {
             return;
         }
-        Set<Item> set = this.model.getSoldItems(vendor[0]);
-        for (Item i : set) {
+        Set<ItemDTO> set = this.model.getSoldItems(vendor[0]);
+        for (ItemDTO i : set) {
             this.appendTo(i.toString());
             this.appendTo("\n");
         }
@@ -81,11 +81,11 @@ public class ControllerImpl implements Controller {
         if (illegalArgs(1, vendor)) {
             return;
         }
-        List<Vendor> vendors = this.model.getVendor(vendor[0]);
-        for (Vendor v : vendors) {
-            this.appendTo(v.toString());
-            this.appendTo("\n");
-        }
+        VendorDTO vendors = this.model.getVendorByName(vendor[0]);
+
+        this.appendTo(vendors.toString());
+        this.appendTo("\n");
+
     }
 
     public void insertStore(String... store) {
@@ -95,14 +95,15 @@ public class ControllerImpl implements Controller {
         this.model.insertStore(store[0], store[1], Integer.parseInt(store[2]));
     }
 
-    public void getStore(String... store) {
-        if (illegalArgs(1, store)) {
+    public void getStore(String... store_id) {
+        if (illegalArgs(1, store_id)) {
             return;
         }
-        List<RetailStore> list = this.model.getStores(store[0]);
-        for (RetailStore r : list) {
-            this.appendTo(list.toString());
-        }
+        int i = Integer.parseInt(store_id[0]);
+        RetailStoreDTO store = this.model.getStoresByID(i);
+
+        this.appendTo(store.toString());
+
     }
 
     // TODO: a individual class for INVENTORY STATUS?
