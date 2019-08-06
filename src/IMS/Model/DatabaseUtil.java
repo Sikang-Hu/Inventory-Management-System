@@ -12,8 +12,8 @@ public class DatabaseUtil {
 //  private static String password = "cs5200proj";
 
     private static String url = "jdbc:mysql://localhost:3306/ims_sku?serverTimezone=EST5EDT";
-    private static String user = "weihan";
-    private static String password = "lwh@123456";
+    private static String user = "root";
+    private static String password = "Y123456h";
 
 
     public static Connection createConnection() throws SQLException {
