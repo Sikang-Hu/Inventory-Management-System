@@ -10,14 +10,14 @@ public class ItemDTO {
   private double itemPrice;
 
   // TODO: access can be package private
-  ItemDTO(int itemId, String categoryName, String itemName, double itemPrice) {
+  public ItemDTO(int itemId, String categoryName, String itemName, double itemPrice) {
     this.itemId = itemId;
     this.categoryName = categoryName;
     this.itemName = itemName;
     this.itemPrice = itemPrice;
   }
 
-  ItemDTO(String categoryName, String itemName, double itemPrice) {
+  public ItemDTO(String categoryName, String itemName, double itemPrice) {
     this(-1, categoryName, itemName, itemPrice);
   }
 

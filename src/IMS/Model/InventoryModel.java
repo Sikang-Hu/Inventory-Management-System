@@ -31,6 +31,9 @@ public interface InventoryModel {
 
   void addSoldItem(String vendorName, List<String> itemInfo);
 
+  // TODO: discuss which to keep
+  void addSoldItem(String vendor, Iterable<ItemDTO> collection);
+
   //Status related
   List<Status> getInvStatus();
 
@@ -44,6 +47,9 @@ public interface InventoryModel {
   //SupplyOrder related
   int insertOrder(String ven_name, int store_id, Date date, List<String> itemInfo);
 
+
+  int insertOrder(String ven_name, int store_id, Date date, Iterable<ItemInTransaction> itemInfo);
+
   List<ItemInTransaction> getOrderItems(int order_id);
 
   List<SupplyOrderDTO> getOrdersByVen_Date(String ven_name, Date date);
@@ -56,6 +62,9 @@ public interface InventoryModel {
 
   //Sale related
   int insertSale(Integer cus_id, String cus_name, int store_id, Date date, List<String> itemInfo);
+
+  // TODO discuss which to keep
+  int insertSale(Integer cus_id, int store_id, Date date, List<ItemInTransaction> itemInfo);
 
   List<ItemInTransaction> getSaleItems(int sale_id);
 

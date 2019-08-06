@@ -24,11 +24,11 @@ class Command {
    */
   private String[] operands;
 
-  private static String stringArg = "(?:(\\w+)|(?:\'([^']+)\'))";
+  static final String stringArg = "(?:(\\w+)|(?:\'([^']+)\'))";
 
-  private static String doubleArg = "(-?\\d+(?:\\.\\d{0,2})?)";
+  static final String doubleArg = "(-?\\d+(?:\\.\\d{0,2})?)";
 
-  private static String zipCode = "\"[0-9]{5}\"";
+  private static final String zipCode = "(\"[0-9]{5}\")";
 
 
   /**
@@ -66,10 +66,14 @@ class Command {
 
     GET_STORE("get store " + Command.stringArg),
 
+    INSERT_CATEGORY(Command.assemble("insert cat", Command.stringArg, Command.stringArg)),
+
+    GET_CATEGORY("get cat " + Command.stringArg),
+
     /**
      *
      */
-    INSERT_ORDER("insert order ((?:\\S+)\\.odr)"),
+    INSERT_TRANSACTION("insert (order|sale) ((?:\\S+)\\.odr)"),
 
     INSERT_VENDOR("insert vendor " + Command.stringArg + " " + Command.stringArg
             + " " + Command.stringArg + " "+ "[0-9]{5}" + " " + Command.stringArg),
@@ -78,11 +82,13 @@ class Command {
 
     GET_SOLD_ITEM("get sold items " + Command.stringArg),
 
+    ADD_SOLD_ITEM(Command.assemble("add item", Command.stringArg, "[^\\s.]+\\.txt")),
+
     INSERT_SALE,
 
     GET_SALE,
 
-    STATUS,
+    STATUS(),
     /**
      * exit/quit the system.
      */
@@ -113,6 +119,7 @@ class Command {
       this.pattern = Pattern.compile("(?i)" + regex + "$");
     }
 
+
   }
 
   /**
@@ -139,6 +146,10 @@ class Command {
       }
     }
     throw new IMSException("Invalid Input: " + command);
+  }
+
+  static String assemble(String... args) {
+    return String.join("\\s+", args);
   }
 
   /**
