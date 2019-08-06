@@ -11,7 +11,7 @@ public class VendorDAO {
 
     int insertVendor(VendorDTO vendor) {
         String sql = this.insertStmt(vendor);
-        return new DatabaseUtil().insertOneRecord(sql);
+        return DatabaseUtil.insertOneRecord(sql);
     }
 
     VendorDTO getVendorByName(String name) {

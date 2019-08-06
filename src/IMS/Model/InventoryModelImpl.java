@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.Date;
 
 public class InventoryModelImpl implements InventoryModel {
+
+
+
   //Category related
     @Override
     public void insertCategory(String categoryName, String categoryDescription) {
@@ -71,6 +74,10 @@ public class InventoryModelImpl implements InventoryModel {
     public void addSoldItem(String vendorName, List<String> itemInfo) {
       Set<ItemDTO> items = processItemForVendor(itemInfo);
       new VendorDAO().addSoldItem(vendorName, items);
+    }
+
+    public void addSoldItem(String vendor, Iterable<ItemDTO> collection) {
+      // May need it
     }
 
     /**
@@ -144,6 +151,11 @@ public class InventoryModelImpl implements InventoryModel {
       return order.insertSupplyOrder(orderDTO, items);
     }
 
+  @Override
+  public int insertOrder(String ven_name, int store_id, Date date, Iterable<ItemInTransaction> itemInfo) {
+      return 0;
+  }
+
     @Override
     public List<ItemInTransaction> getOrderItems(int order_id) {
       SupplyOrderDAO order = new SupplyOrderDAO();
@@ -210,8 +222,13 @@ public class InventoryModelImpl implements InventoryModel {
       return sale.insertSale(saleDTO, items, cus_name);
     }
 
+  @Override
+  public int insertSale(Integer cus_id, int store_id, Date date, List<ItemInTransaction> itemInfo) {
+    return 0;
+  }
 
-    @Override
+
+  @Override
     public List<ItemInTransaction> getSaleItems(int sale_id) {
         SaleDAO sale = new SaleDAO();
         return sale.getSaleItems(sale_id);

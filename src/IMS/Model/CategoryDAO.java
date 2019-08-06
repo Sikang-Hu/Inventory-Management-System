@@ -13,7 +13,7 @@ public class CategoryDAO {
     public int insertCat(CategoryDTO cat) {
         String sql = "INSERT INTO item_category (cat_name, cat_description) VALUES ('"
                 + cat.getCategoryName() + "', '" + cat.getCategoryDescription() + "')";
-        return new DatabaseUtil().insertOneRecord(sql);
+        return DatabaseUtil.insertOneRecord(sql);
     }
 
     public CategoryDTO getCatByName(String name)  {
