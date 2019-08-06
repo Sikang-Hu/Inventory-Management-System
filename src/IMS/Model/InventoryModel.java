@@ -65,6 +65,8 @@ public interface InventoryModel {
 
   SaleDTO getSaleByID(int saleID);
 
+  void returnSale(int sale_id, String item_name, int quantity);
+
 
 
 }

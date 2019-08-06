@@ -235,5 +235,10 @@ public class InventoryModelImpl implements InventoryModel {
       return sale.getSalesStore_Date(store_id, saleDate);
     }
 
+    @Override
+    public void returnSale(int sale_id, String item_name, int quantity) {
+      int item_id = new ItemDAO().getItemByName(item_name).getItemId();
+      new SaleDAO().returnSale(sale_id, item_id, quantity);
+    }
 
 }

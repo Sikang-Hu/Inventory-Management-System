@@ -146,7 +146,26 @@ public class SaleDAO {
         }
     }
 
+    public void returnSale(int sale_id, int item_id, int quantity) {
+        Connection con = null;
+        CallableStatement cstmt = null;
 
+        try {
+            con = DatabaseUtil.createConnection();
+            cstmt = con.prepareCall("{call INSERT_SALE_RETURN(?,?,?)}");
+            cstmt.setInt(1, sale_id);
+            cstmt.setInt(2, item_id);
+            cstmt.setInt(3, quantity);
+            cstmt.execute();
+        } catch (SQLException e) {
+            DatabaseUtil.rollback(con);
+            e.printStackTrace();
+            throw new IMSException(e.getMessage());
+        } finally {
+            DatabaseUtil.close(cstmt);
+            DatabaseUtil.close(con);
+        }
+    }
 
 }
 

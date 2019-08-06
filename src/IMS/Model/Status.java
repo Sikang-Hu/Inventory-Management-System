@@ -1,6 +1,6 @@
 package IMS.Model;
 
-public class Status {
+public class Status{
     private String store;
     private String cat;
     private String item;
