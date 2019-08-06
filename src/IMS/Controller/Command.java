@@ -73,7 +73,7 @@ class Command {
     /**
      *
      */
-    INSERT_TRANSACTION("insert (order|sale) ((?:\\S+)\\.odr)"),
+    INSERT_TRANSACTION("insert (order|sale) ((?:\\S+)\\.txt)"),
 
     INSERT_VENDOR("insert vendor " + Command.stringArg + " " + Command.stringArg
             + " " + Command.stringArg + " "+ "[0-9]{5}" + " " + Command.stringArg),
