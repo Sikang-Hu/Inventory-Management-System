@@ -87,7 +87,4 @@ public class ReorderPoint {
     }
 
 
-    public static void main(String[] args) {
-
-    }
 }
