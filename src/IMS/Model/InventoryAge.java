@@ -4,14 +4,15 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import IMS.IMSException;
 
 public class InventoryAge {
 
-    HashMap<Integer, inventoryAgeObject> map = new HashMap<>();
 
     class inventoryAgeObject {
         private int itemID;
@@ -21,54 +22,77 @@ public class InventoryAge {
 
 
         inventoryAgeObject(int itemID, int SKUID, String name, int age) {
-        this.itemID = itemID;
-        this.SKUID = SKUID;
-        this.name = name;
-        this.age = age;
+            this.itemID = itemID;
+            this.SKUID = SKUID;
+            this.name = name;
+            this.age = age;
 
+        }
+
+
+        int getAge(int age) {
+            return this.age;
+        }
+
+        @Override
+        public String toString() {
+            return "itemID: " + this.itemID +
+                    " SKUID: " + this.SKUID +
+                    " name: " + this.name +
+                    " age: " + this.age;
+        }
     }
 
 
-    int getAge(int age) {
-        return this.age;
+    List<inventoryAgeObject> getAgeByItemId(int itemId) {
+        String sql = "CALL get_remaining_inventory_by_age_of_inv(null, " + itemId + ");";
+        return filterAges(sql);
     }
 
-    @Override
-    public String toString() {
-        return "itemID: " + this.itemID +
-                " SKUID: " + this.SKUID +
-                " name: " + this.name +
-                " age: " + this.age;
+    List<inventoryAgeObject> getAgeByStoreId(int storeId) {
+        String sql = "CALL get_remaining_inventory_by_age_of_inv(" + storeId + ", null);";
+        return filterAges(sql);
     }
 
-}
+    List<inventoryAgeObject> getAgeByItemIdAndStoreId(int itemId, int storeId) {
+        String sql = "CALL get_remaining_inventory_by_age_of_inv(" + storeId + ", " +
+                itemId + ");";
+        return filterAges(sql);
+    }
 
+    List<inventoryAgeObject> getAllAges() {
+        String sql = "CALL get_remaining_inventory_by_age_of_inv(null, null);";
+        return filterAges(sql);
+    }
 
-    void getAge() {
-        String sql =  "CALL get_remaining_inventory_by_age_of_inv(null, null);";
+    List<inventoryAgeObject> filterAges(String sql) {
+        List<inventoryAgeObject> list = new ArrayList<>();
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                this.map.put(rs.getInt(1),
-                        new inventoryAgeObject(rs.getInt(4),
-                                rs.getInt(1),rs.getString(5),rs.getInt(9)));
+                inventoryAgeObject object = new inventoryAgeObject(rs.getInt(4),
+                        rs.getInt(1), rs.getString(5),
+                        rs.getInt(9));
+                list.add(object);
             }
+
+            return list;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new IMSException(e.getMessage());
         }
 
-        for (Map.Entry<Integer, inventoryAgeObject> entry : this.map.entrySet()) {
-            System.out.println(entry.getValue());
-        }
     }
 
 
     public static void main(String[] args) {
-        new InventoryAge().getAge();
-    }
+        List<inventoryAgeObject> list=  new InventoryAge().getAllAges();
+        for (inventoryAgeObject o : list) {
+            System.out.println(o);
 
+        }
+    }
 
 
 }
