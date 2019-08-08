@@ -39,7 +39,8 @@ public class SaleDAO {
 
 
     //input saleDTO item and list of ItemInTransaction, insert this sale to database
-    public int insertSale(SaleDTO sale, List<ItemInTransaction> items, String cus_name) {
+    //
+    public int insertSale(SaleDTO sale, Iterable<ItemInTransaction> items, String cus_name) {
         int key = -1;
         Connection con = null;
         CallableStatement cstmt = null;
@@ -166,6 +167,7 @@ public class SaleDAO {
             DatabaseUtil.close(con);
         }
     }
+
 
 }
 

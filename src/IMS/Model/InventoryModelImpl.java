@@ -1,5 +1,7 @@
 package IMS.Model;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
+
 import IMS.IMSException;
 
 import java.sql.*;
@@ -24,7 +26,7 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
-    public CategoryDTO getCatByName(int cat_id) {
+    public CategoryDTO getCatByID(int cat_id) {
       return new CategoryDAO().getCatByID(cat_id);
     }
 
@@ -71,46 +73,39 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
-    public void addSoldItem(String vendorName, List<String> itemInfo) {
-      Set<ItemDTO> items = processItemForVendor(itemInfo);
-      new VendorDAO().addSoldItem(vendorName, items);
-    }
-
     public void addSoldItem(String vendor, Iterable<ItemDTO> collection) {
-      // May need it
+      new VendorDAO().addSoldItem(vendor, collection);
     }
 
-    /**
-     * Phrase itemInfo and return a list of ItemDAO.
-     * @param itemInfo format of "cat_id,item_name,item_unit_price"
-     * @return a list of ItemDAO
-     */
-    private Set<ItemDTO> processItemForVendor(List<String> itemInfo) {
-      Set<ItemDTO> result = new HashSet<>();
-      int cat_id;
-      String cat_name;
-      String item_name;
-      Double unit_cost;
-      for (String i : itemInfo) {
-        String[] i_array = i.split(",");
-        cat_id = Integer.parseInt(i_array[0]);
-        cat_name = new CategoryDAO().getCatByID(cat_id).getCategoryName();
-        item_name = i_array[1];
-        unit_cost = Double.parseDouble(i_array[2]);
-        // TODO: how to handle illegalArgument exception? e.g. can't phrase to double.
-        ItemDTO item = new ItemDTO(cat_name, item_name, unit_cost);
-        result.add(item);
-      }
-      return result;
-      }
 
+    //status
     @Override
-    public List<Status> getInvStatus() {
+    public List<Status> getInvStatus(Integer store_id, String item_name, String cat_name) {
         try (Connection con = DatabaseUtil.createConnection();
              CallableStatement stmt = con.prepareCall("{CALL INV_STATUS(?, ?, ?)}")) {
+          if (store_id == null) {
             stmt.setNull(1, Types.INTEGER);
+          }
+          else {
+            stmt.setInt(1, store_id);
+          }
+          if (item_name == null) {
             stmt.setNull(2, Types.INTEGER);
+          }
+          else {
+            ItemDTO item = new ItemDAO().getItemByName(item_name);
+            int item_id = item.getItemId();
+            stmt.setInt(2, item_id);
+          }
+          if (cat_name == null) {
             stmt.setNull(3, Types.INTEGER);
+          }
+          else {
+            int cat_id = new CategoryDAO().getCatByName(cat_name).getCategoryID();
+            stmt.setInt(3, cat_id);
+          }
+
+
             ResultSet rs = stmt.executeQuery();
             List<Status> result = new ArrayList<>();
             while (rs.next()) {
@@ -125,6 +120,7 @@ public class InventoryModelImpl implements InventoryModel {
 
 
 
+    //store
     @Override
     public void insertStore(String address, String state, int zipCode) {
       RetailStoreDTO store = new RetailStoreDTO(address, state, zipCode);
@@ -136,25 +132,19 @@ public class InventoryModelImpl implements InventoryModel {
         return new RetailStoreDAO().getStoreByID(storeID);
     }
 
+
     @Override
-    public RetailStoreDTO getStoresByName(String name) {
-      return new RetailStoreDAO().getStoreByName(name);
+    public List<RetailStoreDTO> getAllStore() {
+      return new RetailStoreDAO().getAllStore();
     }
 
     //order related
     @Override
-    public int insertOrder(String ven_name, int store_id, Date date, List<String> itemInfo) {
-      int ven_id = new VendorDAO().getVendorByName(ven_name).getVendorID();
-      List<ItemInTransaction> items= processItemInTransaction(itemInfo);
-      SupplyOrderDTO orderDTO = new SupplyOrderDTO(ven_id,store_id,date);
-      SupplyOrderDAO order = new SupplyOrderDAO();
-      return order.insertSupplyOrder(orderDTO, items);
+    public int insertOrder(String ven_name, int store_id, Date date, Iterable<ItemInTransaction> items) {
+        int ven_id = new VendorDAO().getVendorByName(ven_name).getVendorID();
+        SupplyOrderDTO order = new SupplyOrderDTO(ven_id, store_id, date);
+        return new SupplyOrderDAO().insertSupplyOrder(order, items);
     }
-
-  @Override
-  public int insertOrder(String ven_name, int store_id, Date date, Iterable<ItemInTransaction> itemInfo) {
-      return 0;
-  }
 
     @Override
     public List<ItemInTransaction> getOrderItems(int order_id) {
@@ -188,44 +178,16 @@ public class InventoryModelImpl implements InventoryModel {
       order.updateDeliveryDate(order_id);
     }
 
-  /**
-   * Helper function to phrase the order info in to Map of item object and its quantity.
-   * @param itemInfo in the format of “iteme_name,item_quantity,unit_cost”
-   * @return Map of Item Object and its quantity
-   */
-    private List<ItemInTransaction> processItemInTransaction(List<String> itemInfo) {
-      List<ItemInTransaction> result = new ArrayList<>();
-      String item_name;
-      int item_id;
-      Double unit_cost;
-      int quantity;
-      for (String i : itemInfo) {
-        String[] i_array = i.split(",");
-        item_name = i_array[0];
-        item_id = new ItemDAO().getItemByName(item_name).getItemId();
-        unit_cost = Double.parseDouble(i_array[2]);
-        quantity = Integer.parseInt(i_array[1]);
-        // TODO: how to handle illegalArgument exception? e.g. can't phrase to double.
-        ItemInTransaction item = new ItemInTransaction(item_id, quantity, unit_cost);
-        result.add(item);
-      }
-      return result;
-  }
-
 
     //Sale related
     @Override
-    public int insertSale(Integer cus_id, String cus_name, int store_id, Date date, List<String> itemInfo) {
-      List<ItemInTransaction> items = processItemInTransaction(itemInfo);
+    public int insertSale(Integer cus_id, int store_id, Date date, Iterable<ItemInTransaction> items) {
+      String cus_name = new CustomerDAO().getName(cus_id);
       SaleDTO saleDTO = new SaleDTO(store_id, cus_id, date);
       SaleDAO sale = new SaleDAO();
       return sale.insertSale(saleDTO, items, cus_name);
     }
 
-  @Override
-  public int insertSale(Integer cus_id, int store_id, Date date, List<ItemInTransaction> itemInfo) {
-    return 0;
-  }
 
 
   @Override

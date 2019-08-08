@@ -47,12 +47,13 @@ public class ControllerImpl implements Controller {
         illegalArgs(1, cat);
         try {
             int i = Integer.parseInt(cat[0]);
-            category = this.model.getCatByName(i);
+            category = this.model.getCatByID(i);
         } catch (NumberFormatException e) {
             category = this.model.getCatByName(cat[0]);
         }
         this.appendTo(this.pr.printCategory(category));
     }
+
 
     /**
      * Insert an item into the system, the clients need to specify its name, category, unit price.
@@ -85,6 +86,8 @@ public class ControllerImpl implements Controller {
 
     }
 
+
+
     public void insertVendor(String... vendor) {
         illegalArgs(5, vendor);
         this.model.insertVendor(vendor[0], vendor[1], vendor[2], Integer.parseInt(vendor[3]), vendor[4]);
@@ -104,12 +107,13 @@ public class ControllerImpl implements Controller {
     }
 
 
-    // For user-friendly accept input <name> <cat> <price>
+    // For user-friendly accept input <name> <cat name> <price> in the file
     public void addSoldItem(String... item) {
         illegalArgs(2, item);
         try (BufferedReader rd = new BufferedReader(new FileReader(item[1]))) {
             List<ItemDTO> l = new ArrayList<>();
-            Pattern format = Pattern.compile(Command.assemble(Command.stringArg, Command.stringArg, Command.doubleArg));
+            Pattern format = Pattern.compile(Command.assemble(Command.stringArg, Command.stringArg,
+                    Command.doubleArg));
             String ln;
             while ((ln = rd.readLine()) != null) {
                 Matcher m = format.matcher(ln);
@@ -137,18 +141,36 @@ public class ControllerImpl implements Controller {
         this.model.insertStore(store[0], store[1], Integer.parseInt(store[2]));
     }
 
-    // TODO: get all stores
-    public void getStore(String... store_id) {
-        illegalArgs(1, store_id);
-        int i = Integer.parseInt(store_id[0]);
-        RetailStoreDTO store = this.model.getStoresByID(i);
-        this.appendTo(this.pr.printStore(store));
+
+
+
+    //input: store_id(could be null)
+    public void getStore(String ... store) {
+        illegalArgs(1, store);
+        if (store.equals("null")) {
+            List<RetailStoreDTO> stores = this.model.getAllStore();
+            this.appendTo(this.pr.printStore(stores.toArray(new RetailStoreDTO[0])));
+        } else {
+            int i = Integer.parseInt(store[0]);
+            RetailStoreDTO store1 = this.model.getStoresByID(i);
+            this.appendTo(this.pr.printStore(store1));
+        }
+
     }
 
 
-    // TODO: more general
+
+
+    //input: store_id/null item_name/null cat_name/null
     public void getStatus(String... para) {
-        List<Status> list = this.model.getInvStatus();
+        illegalArgs(3, para);
+        Integer store_id;
+        try {
+            store_id = Integer.parseInt(para[0]);
+        } catch (NumberFormatException e) {
+            store_id = null;
+        }
+        List<Status> list = this.model.getInvStatus(store_id, para[1], para[2]);
         for (Status s : list) {
             this.appendTo(s.toString());
             this.appendTo("\n");
@@ -157,6 +179,9 @@ public class ControllerImpl implements Controller {
     }
 
     // TODO: split to regex which
+    //Input: order/sale filename_of_items
+    // File: first line: ven_name/cus_id, store_id, date(MM/dd/yyyy)
+    // Next lines: item_id, quantity, price
     public void insertTransaction(String... trans) {
         illegalArgs(2, trans);
         try (BufferedReader rd = new BufferedReader(new FileReader(trans[1]))) {
@@ -166,7 +191,7 @@ public class ControllerImpl implements Controller {
             String[] order = ln.split("\\s+");
             Date date = null;
             try {
-                date = new SimpleDateFormat("mm/dd/yyyy").parse(order[3]);
+                date = new SimpleDateFormat("MM/dd/yyyy").parse(order[3]);
             } catch (ParseException e) {
                 e.printStackTrace();
                 throw new IMSException(e.getMessage());
@@ -180,7 +205,7 @@ public class ControllerImpl implements Controller {
             }
             if (trans[0].equals("order")) {
                 this.model.insertOrder(order[0], Integer.parseInt(order[1]), date, items);
-            } else if (trans[1].equals("sale")) {
+            } else if (trans[0].equals("sale")) {
                 this.model.insertSale(Integer.parseInt(order[0]), Integer.parseInt(order[1]), date, items);
             }
         } catch (IOException e) {
@@ -188,6 +213,78 @@ public class ControllerImpl implements Controller {
             throw new IMSException(e.getMessage());
         }
     }
+
+    //input: order/sale order_id/sale_id
+    public void getItemsInTransaction(String ... transaction) {
+        illegalArgs(2, transaction);
+        List<ItemInTransaction> result = new ArrayList<>();
+        if (transaction[0].equals("order")) {
+            result = this.model.getOrderItems(Integer.parseInt(transaction[1]));
+        } else if (transaction[0].equals("sale")) {
+            result = this.model.getSaleItems(Integer.parseInt(transaction[1]));
+        }
+        this.appendTo(this.pr.printItemInTranscation(result.toArray(new ItemInTransaction[0])));
+    }
+
+
+    //input; order/sale customer/vendor/store customer_id/vendor_name/store_id MM/dd/yyyy
+    public void getTransacByCondition(String ... transactions) {
+        illegalArgs(4, transactions);
+        Date date;
+        int store_id;
+        List<SupplyOrderDTO> result_orders = new ArrayList<>();
+        List<SaleDTO> result_sales = new ArrayList<>();
+
+        try {
+            date = new SimpleDateFormat("MM/dd/yyyy").parse(transactions[3]);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new IMSException(e.getMessage());
+        }
+
+        if (transactions[0].equals("order")) {
+            if (transactions[1].equals("vendor")) {
+                result_orders = this.model.getOrdersByVen_Date(transactions[2], date);
+            } else if (transactions[1].equals("store")) {
+                store_id = Integer.parseInt(transactions[2]);
+                result_orders = this.model.getOrdersByStore_Date(store_id, date);
+            }
+            this.appendTo(this.pr.printOrder(result_orders.toArray(new SupplyOrderDTO[0])));
+        } else if (transactions[0].equals("sale")) {
+            if (transactions[1].equals("customer")) {
+                result_sales = this.model.getSalesByCus_Date(Integer.parseInt(transactions[2]), date);
+            }else if(transactions[1].equals("store")) {
+                result_sales = this.model.getSalesStore_Date(Integer.parseInt(transactions[2]), date);
+            }
+            this.appendTo(this.pr.printSale(result_sales.toArray(new SaleDTO[0])));
+        }
+
+    }
+
+    //input: sale/order sale_id/order_id
+    public void getTransactionByID(String ... transac) {
+        illegalArgs(2, transac);
+        if (transac[0].equals("order")) {
+            SupplyOrderDTO result_order = this.model.getOrderByID(Integer.parseInt(transac[1]));
+            this.appendTo(this.pr.printOrder(result_order));
+        } else if (transac[0].equals("sale")) {
+            SaleDTO result_sale = this.model.getSaleByID(Integer.parseInt(transac[1]));
+            this.appendTo(this.pr.printSale(result_sale));
+        }
+    }
+    //input: order_id
+    public void updateDeliveryDate(String ... order) {
+        illegalArgs(1, order);
+        this.model.updateDeliveryDate(Integer.parseInt(order[0]));
+    }
+
+
+    //input sale_id, item_name, quantity
+    public void returnSale(String ... sale) {
+        illegalArgs(1, sale);
+        this.model.returnSale(Integer.parseInt(sale[0]), sale[1], Integer.parseInt(sale[2]));
+    }
+
 
     /**
      * Activate the command user interface processor of this inventory management system.
@@ -254,12 +351,22 @@ public class ControllerImpl implements Controller {
         commands.put(Command.Type.INSERT_VENDOR, this::getVendor);
         commands.put(Command.Type.GET_VENDOR, this::getVendor);
         commands.put(Command.Type.GET_SOLD_ITEM, this::getSoldItem);
+        commands.put(Command.Type.ADD_SOLD_ITEM, this::addSoldItem);
+
+        commands.put(Command.Type.STATUS, this::getStatus);
+
+        commands.put(Command.Type.GET_STORE, this::getStore);
+        commands.put(Command.Type.INSERT_STORE, this::insertStore);
 
         commands.put(Command.Type.INSERT_TRANSACTION, this::insertTransaction);
+        commands.put(Command.Type.GET_ITEM_IN_TRANSAC, this::getItemsInTransaction);
+        commands.put(Command.Type.GET_TRANSACTION_BY_CONDITION, this::getTransacByCondition);
+        commands.put(Command.Type.GET_TRANSACTION_BY_ID, this::getTransactionByID);
 
-        commands.put(Command.Type.INSERT_SALE, this::insertVendor);
-        commands.put(Command.Type.GET_SALE, this::insertVendor);
-        commands.put(Command.Type.STATUS, this::getStatus);
+        commands.put(Command.Type.UPDATE_DELIVERY, this::updateDeliveryDate);
+        commands.put(Command.Type.RETURN_SALE, this::returnSale);
+
+
 
         commands.put(Command.Type.EXIT, i->System.exit(0));
         commands.put(Command.Type.QUIT, i->System.exit(1));

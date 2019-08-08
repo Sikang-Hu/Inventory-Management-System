@@ -37,7 +37,7 @@ public class SupplyOrderDAO {
   }
 
   //input orderDTO object, and list of ItemInTransaction, insert this order.
-  public int insertSupplyOrder(SupplyOrderDTO order, List<ItemInTransaction> items) {
+  public int insertSupplyOrder(SupplyOrderDTO order, Iterable<ItemInTransaction> items) {
     int key = -1;
     Connection con = null;
     Statement stmt = null;

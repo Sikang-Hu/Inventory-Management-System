@@ -11,7 +11,7 @@ public interface InventoryModel {
 
   CategoryDTO getCatByName(String cat_name);
 
-  CategoryDTO getCatByName(int cat_name);
+  CategoryDTO getCatByID(int cat_name);
 
   //Item related
   void insertItem(String name, String category, double unitPrice);
@@ -29,25 +29,20 @@ public interface InventoryModel {
 
   Set<ItemDTO> getSoldItems(String name);
 
-  void addSoldItem(String vendorName, List<String> itemInfo);
-
-  // TODO: discuss which to keep
   void addSoldItem(String vendor, Iterable<ItemDTO> collection);
 
   //Status related
-  List<Status> getInvStatus();
+  List<Status> getInvStatus(Integer store_id, String item_name, String cat_name);
 
   //store related
   void insertStore(String address, String state, int zipCode);
 
   RetailStoreDTO getStoresByID(int storeID);
 
-  RetailStoreDTO getStoresByName(String store_name);
+
+  List<RetailStoreDTO> getAllStore();
 
   //SupplyOrder related
-  int insertOrder(String ven_name, int store_id, Date date, List<String> itemInfo);
-
-
   int insertOrder(String ven_name, int store_id, Date date, Iterable<ItemInTransaction> itemInfo);
 
   List<ItemInTransaction> getOrderItems(int order_id);
@@ -61,10 +56,8 @@ public interface InventoryModel {
   void updateDeliveryDate(int order_id);
 
   //Sale related
-  int insertSale(Integer cus_id, String cus_name, int store_id, Date date, List<String> itemInfo);
 
-  // TODO discuss which to keep
-  int insertSale(Integer cus_id, int store_id, Date date, List<ItemInTransaction> itemInfo);
+  int insertSale(Integer cus_id, int store_id, Date date, Iterable<ItemInTransaction> items);
 
   List<ItemInTransaction> getSaleItems(int sale_id);
 

@@ -2,18 +2,18 @@ package IMS.Model;
 
 import java.util.Objects;
 
-public class Customer {
+public class CustomerDTO {
 
     private int customerID;
     private String customerName;
 
 
-    public Customer(String name) {
+    public CustomerDTO(String name) {
         this.customerID = -1;
         this.customerName = name;
     }
 
-    public Customer(int customerID, String name) {
+    public CustomerDTO(int customerID, String name) {
         this.customerID = customerID;
         this.customerName = name;
     }
@@ -28,10 +28,10 @@ public class Customer {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof Customer)) {
+        if (!(other instanceof CustomerDTO)) {
             return false;
         }
-        Customer otherCus = (Customer)other;
+        CustomerDTO otherCus = (CustomerDTO)other;
         if (this.customerName == otherCus.getName()) {
             return true;
         }

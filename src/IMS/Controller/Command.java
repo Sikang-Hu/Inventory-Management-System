@@ -29,6 +29,8 @@ class Command {
   static final String doubleArg = "(-?\\d+(?:\\.\\d{0,2})?)";
 
   private static final String zipCode = "(\"[0-9]{5}\")";
+  private static final String id = "(\"[0-9]{10}\")";
+  private static final String date = "^((0|1)\\d{1})/((0|1|2)\\d{1})/((19|20)\\d{2})";
 
 
   /**
@@ -50,6 +52,12 @@ class Command {
   enum Type {
 
 
+    // insert cat cat_name cat_description
+    INSERT_CATEGORY(Command.assemble("insert cat", Command.stringArg, Command.stringArg)),
+
+    //get cat cat_name
+    GET_CATEGORY("get cat " + Command.stringArg),
+
 
     /**
      * Insert command, which insert an entities to the database the format should be {
@@ -58,37 +66,53 @@ class Command {
     INSERT_ITEM("insert item " + Command.stringArg + " " + Command.stringArg + " " +Command.doubleArg),
 
     /**
-     * Get command, query a entities from the database the format should be {@code get <entities> <name>}.
+     * Get command, query a entities from the database the format should be {@code get <entities> <name>/<<item_id>}.
      */
-    GET_ITEM("get item " +  Command.stringArg),
+    GET_ITEM("get item " +  "(" + Command.stringArg + "|"+  Command.id + ")"),
 
-    INSERT_STORE("insert store " + Command.stringArg + " " + Command.stringArg + " " +Command.zipCode),
 
-    GET_STORE("get store " + Command.stringArg),
-
-    INSERT_CATEGORY(Command.assemble("insert cat", Command.stringArg, Command.stringArg)),
-
-    GET_CATEGORY("get cat " + Command.stringArg),
-
-    /**
-     *
-     */
-    INSERT_TRANSACTION("insert (order|sale) ((?:\\S+)\\.odr)"),
-
+    //insert vendor ven_name address state zipcode
     INSERT_VENDOR("insert vendor " + Command.stringArg + " " + Command.stringArg
-            + " " + Command.stringArg + " "+ "[0-9]{5}" + " " + Command.stringArg),
+            + " " + Command.stringArg + " "+ "[0-9]{5}" + " " + Command.zipCode),
 
-    GET_VENDOR("get vendor " + Command.stringArg),
+    //get vendor ven_name/ven_id
+    GET_VENDOR("get vendor " + "(" + Command.stringArg + "|"+  Command.id + ")"),
 
+    //get sold items ven_name
     GET_SOLD_ITEM("get sold items " + Command.stringArg),
 
+    //add item ven_name fileName_of_items.txt
     ADD_SOLD_ITEM(Command.assemble("add item", Command.stringArg, "[^\\s.]+\\.txt")),
 
-    INSERT_SALE,
 
-    GET_SALE,
 
-    STATUS(),
+    //insert store address state zip
+    INSERT_STORE("insert store " + Command.stringArg + " " + Command.stringArg + " " +Command.zipCode),
+
+    //get store name/id
+    GET_STORE("get store " + Command.stringArg),
+
+    //status store_id/null item_name/null cat_name/null
+    STATUS("status" + Command.id + Command.stringArg + Command.stringArg),
+
+
+    INSERT_TRANSACTION("insert (order|sale) ((?:\\S+)\\.odr)"),
+
+    //get item in transaction order/sale order_id/sale_id
+    GET_ITEM_IN_TRANSAC("get item in transaction (order|sale) " + Command.id),
+    //get order/sale customer/vendor/store customer_id/vendor_name/store_id MM/dd/yyyy
+    GET_TRANSACTION_BY_CONDITION("get (order|sale) (customer|vendor|store) " + "("
+            + Command.id + "|" + Command.stringArg + ")" + Command.date),
+    //get transaction  by id sale/order sale_id/order_id
+    GET_TRANSACTION_BY_ID("get transaction by id (order|sale) " + Command.id),
+
+    //delivered order_id
+    UPDATE_DELIVERY("delivered " + Command.id),
+
+    //return sale_id item_name, quantity
+    RETURN_SALE("return " + Command.id + Command.stringArg + Command.id),
+
+
     /**
      * exit/quit the system.
      */

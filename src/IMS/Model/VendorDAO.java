@@ -44,7 +44,7 @@ public class VendorDAO {
     }
 
 
-    void addSoldItem(String vendorName, Set<ItemDTO> items) {
+    void addSoldItem(String vendorName, Iterable<ItemDTO> items) {
         CallableStatement stmt = null;
         Connection con = null;
         try {
