@@ -68,6 +68,30 @@ public interface InventoryModel {
 
   void returnSale(int sale_id, String item_name, int quantity);
 
+  //reorder related
+  List<ReorderPoint.reorderObject> getReminderByItemId(int itemId);
 
+  List<ReorderPoint.reorderObject> getReminderByStoreId(int storeId);
 
-}
+  List<ReorderPoint.reorderObject> getReminderByItemIdAndStoreId(int itemId, int storeId);
+
+  List<ReorderPoint.reorderObject> getAllReminders();
+
+  //Inventory age related
+  List<InventoryAge.inventoryAgeObject> getAgeByItemId(int itemId);
+
+  List<InventoryAge.inventoryAgeObject> getAgeByStoreId(int storeId);
+
+  List<InventoryAge.inventoryAgeObject> getAgeByItemIdAndStoreId(int itemId, int storeId);
+
+  List<InventoryAge.inventoryAgeObject> getAllAges();
+
+  //Turnover related
+  List<Turnover.turnoverObject> getTurnoverByItemId(int itemId, int numPastWeek);
+
+  List<Turnover.turnoverObject> getTurnoverByStoreId(int storeId, int numPastWeek);
+
+  List<Turnover.turnoverObject> getTurnoverByItemIdAndStoreId(int itemId, int storeId, int numPastWeek);
+
+  List<Turnover.turnoverObject> getAllTurnovers(int numPastWeek);
+  }

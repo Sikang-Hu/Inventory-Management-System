@@ -206,7 +206,10 @@ public class InventoryModelImpl implements InventoryModel {
       return sale.getOrderByID(saleID);
     }
 
-    @Override
+
+
+
+  @Override
     public List<SaleDTO> getSalesByCus_Date(int customer_id, Date date) {
       SaleDAO sale = new SaleDAO();
       return sale.getSalesByCus_Date(customer_id, date);
@@ -224,5 +227,72 @@ public class InventoryModelImpl implements InventoryModel {
       System.out.println(item_id);
       new SaleDAO().returnSale(sale_id, item_id, quantity);
     }
+
+    //reorder related
+
+  @Override
+  public List<ReorderPoint.reorderObject> getReminderByItemId(int itemId) {
+    return new ReorderPoint().getReminderByItemId(itemId);
+  }
+
+  @Override
+  public List<ReorderPoint.reorderObject> getReminderByStoreId(int storeId) {
+    return new ReorderPoint().getReminderByStoreId(storeId);
+  }
+
+  @Override
+  public List<ReorderPoint.reorderObject> getReminderByItemIdAndStoreId(int itemId, int storeId) {
+    return new ReorderPoint().getReminderByItemIdAndStoreId(itemId, storeId);
+  }
+
+  @Override
+  public List<ReorderPoint.reorderObject> getAllReminders() {
+    return new ReorderPoint().getAllReminders();
+  }
+
+
+  //Inventory age related
+  @Override
+  public List<InventoryAge.inventoryAgeObject> getAgeByItemId(int itemId) {
+    return new InventoryAge().getAgeByItemId(itemId);
+  }
+
+  @Override
+  public List<InventoryAge.inventoryAgeObject> getAgeByStoreId(int storeId) {
+    return new InventoryAge().getAgeByStoreId(storeId);
+  }
+
+  @Override
+  public List<InventoryAge.inventoryAgeObject> getAgeByItemIdAndStoreId(int itemId, int storeId) {
+    return new InventoryAge().getAgeByItemIdAndStoreId(itemId, storeId);
+  }
+
+  @Override
+  public List<InventoryAge.inventoryAgeObject> getAllAges() {
+    return new InventoryAge().getAllAges();
+  }
+
+
+  //Turnover related
+
+  @Override
+  public List<Turnover.turnoverObject> getTurnoverByItemId(int itemId, int numPastWeek) {
+    return new Turnover().getTurnoverByItemId(itemId, numPastWeek);
+  }
+
+  @Override
+  public List<Turnover.turnoverObject> getTurnoverByStoreId(int storeId, int numPastWeek) {
+    return new Turnover().getTurnoverByStoreId(storeId, numPastWeek);
+  }
+
+  @Override
+  public List<Turnover.turnoverObject> getTurnoverByItemIdAndStoreId(int itemId, int storeId, int numPastWeek) {
+    return new Turnover().getTurnoverByItemIdAndStoreId(itemId, storeId, numPastWeek);
+  }
+
+  @Override
+  public List<Turnover.turnoverObject> getAllTurnovers(int numPastWeek) {
+    return new Turnover().getAllTurnovers(numPastWeek);
+  }
 
 }

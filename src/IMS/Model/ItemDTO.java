@@ -8,6 +8,7 @@ public class ItemDTO {
   private String categoryName;
   private String itemName;
   private double itemPrice;
+  private int reorderPoint;
 
   // TODO: access can be package private
   public ItemDTO(int itemId, String categoryName, String itemName, double itemPrice) {
@@ -77,7 +78,8 @@ public class ItemDTO {
     return itemPrice;
   }
 
-  public void setItemPrice(double itemPrice) {
-    this.itemPrice = itemPrice;
+  public void setItemPrice(double itemPrice) {this.itemPrice = itemPrice;}
+
+  public void setReorderPonit(int reorderPoint) {this.reorderPoint = reorderPoint;
   }
 }
