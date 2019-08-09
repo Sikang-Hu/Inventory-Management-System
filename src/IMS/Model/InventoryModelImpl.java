@@ -241,8 +241,8 @@ public class InventoryModelImpl implements InventoryModel {
   }
 
   @Override
-  public List<ReorderPoint.reorderObject> getReminderByItemIdAndStoreId(int itemId, int storeId) {
-    return new ReorderPoint().getReminderByItemIdAndStoreId(itemId, storeId);
+  public ReorderPoint.reorderObject getReminderByItemIdAndStoreId(int itemId, int storeId) {
+    return new ReorderPoint().getReminderByItemIdAndStoreId(itemId, storeId).get(0);
   }
 
   @Override
@@ -263,8 +263,8 @@ public class InventoryModelImpl implements InventoryModel {
   }
 
   @Override
-  public List<InventoryAge.inventoryAgeObject> getAgeByItemIdAndStoreId(int itemId, int storeId) {
-    return new InventoryAge().getAgeByItemIdAndStoreId(itemId, storeId);
+  public InventoryAge.inventoryAgeObject getAgeByItemIdAndStoreId(int itemId, int storeId) {
+    return new InventoryAge().getAgeByItemIdAndStoreId(itemId, storeId).get(0);
   }
 
   @Override
@@ -286,13 +286,43 @@ public class InventoryModelImpl implements InventoryModel {
   }
 
   @Override
-  public List<Turnover.turnoverObject> getTurnoverByItemIdAndStoreId(int itemId, int storeId, int numPastWeek) {
-    return new Turnover().getTurnoverByItemIdAndStoreId(itemId, storeId, numPastWeek);
+  public Turnover.turnoverObject getTurnoverByItemIdAndStoreId(int itemId, int storeId, int numPastWeek) {
+    return new Turnover().getTurnoverByItemIdAndStoreId(itemId, storeId, numPastWeek).get(0);
   }
 
   @Override
   public List<Turnover.turnoverObject> getAllTurnovers(int numPastWeek) {
     return new Turnover().getAllTurnovers(numPastWeek);
+  }
+
+  //Profit analysis related
+
+  @Override
+  public List<ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemId
+  (int itemID, Date startDate, Date endDate) {
+    ProfitAnalysis analysis =  new ProfitAnalysis();
+    return analysis.getProfitRatioByItemId(itemID, startDate, endDate);
+  }
+
+  @Override
+  public List<ProfitAnalysis.profitAnalysisObject> getProfitRatioByStoreId
+  (int storeID, Date startDate, Date endDate) {
+    ProfitAnalysis analysis =  new ProfitAnalysis();
+    return analysis.getProfitRatioByStoreId(storeID, startDate, endDate);
+  }
+
+  @Override
+  public ProfitAnalysis.profitAnalysisObject getProfitRatioByItemIdAndStoreId
+  (int storeID, int itemID, Date startDate, Date endDate) {
+    ProfitAnalysis analysis =  new ProfitAnalysis();
+    return analysis.getProfitRatioByItemIdAndStoreId(storeID,itemID, startDate, endDate);
+  }
+
+  @Override
+  public List<ProfitAnalysis.profitAnalysisObject> getAllProfitRatio
+  (Date startDate, Date endDate) {
+    ProfitAnalysis analysis =  new ProfitAnalysis();
+    return analysis.getAllProfitRatio(startDate, endDate);
   }
 
 }

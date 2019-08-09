@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,15 +15,23 @@ import IMS.IMSException;
 public class Turnover {
 
 
-    class turnoverObject {
+    public class turnoverObject {
         private int itemID;
-        private double storeID;
+        private int storeID;
         private double turnover;
 
         turnoverObject (int item_id, int storeID, double turnover) {
             this.itemID = item_id;
             this.storeID = storeID;
             this.turnover = turnover;
+        }
+
+        public int getItemID() {
+            return this.itemID;
+        }
+
+        public int getStoreID() {
+            return this. storeID;
         }
 
         double getTurnover() {
@@ -73,6 +82,7 @@ public class Turnover {
                         rs.getDouble(7));
                 list.add(object);
             }
+            list.sort(Comparator.comparing(turnoverObject::getTurnover).reversed());
 
             return list;
         } catch (SQLException e) {
@@ -81,11 +91,4 @@ public class Turnover {
         }
 
     }
-
-
-    public static void main(String[] args) {
-    }
-
-
-
 }

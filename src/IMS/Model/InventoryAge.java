@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import IMS.IMSException;
 public class InventoryAge {
 
 
-    class inventoryAgeObject {
+    public class inventoryAgeObject {
         private int itemID;
         private int SKUID;
         private String name;
@@ -29,8 +30,19 @@ public class InventoryAge {
 
         }
 
+        public int getItemID() {
+            return this.itemID;
+        }
 
-        int getAge(int age) {
+        public int getSKUID() {
+            return this.SKUID;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public int getAge() {
             return this.age;
         }
 
@@ -76,6 +88,7 @@ public class InventoryAge {
                         rs.getInt(9));
                 list.add(object);
             }
+            list.sort(Comparator.comparing(inventoryAgeObject::getAge).reversed());
 
             return list;
         } catch (SQLException e) {
@@ -85,14 +98,6 @@ public class InventoryAge {
 
     }
 
-
-    public static void main(String[] args) {
-        List<inventoryAgeObject> list=  new InventoryAge().getAllAges();
-        for (inventoryAgeObject o : list) {
-            System.out.println(o);
-
-        }
-    }
 
 
 }
