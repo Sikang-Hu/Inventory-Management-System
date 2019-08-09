@@ -106,7 +106,6 @@ public class SupplyOrderDAO {
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     String date = df.format(orderDate);
     String sql = "SELECT * FROM supply_order WHERE ven_id = " + ven_id + " and order_date = '" + date + "'";
-    System.out.println(sql);
     return filterOrders(sql);
   }
 
@@ -149,6 +148,8 @@ public class SupplyOrderDAO {
       throw new IMSException(e.getMessage());
     }
   }
+
+
 
 
 }

@@ -15,8 +15,9 @@ public class ItemDAO {
 
     // TODO: Use lambda to abstract
     int insertItem(ItemDTO item) {
-        int catID = new CategoryDAO().getCatByName(item.getItemName()).getCategoryID();
-        String sql = this.insertStmt(catID, item.getItemName(),item.getItemPrice());
+        int catID = new CategoryDAO().getCatByName(item.getCategoryName()).getCategoryID();
+        String sql = "INSERT INTO item (cat_id, item_name, item_unit_price) VALUES (" + catID + ", '"
+                + item.getItemName() + "', " + item.getItemPrice() + ")";
         return new DatabaseUtil().insertOneRecord(sql);
     }
 
@@ -28,11 +29,6 @@ public class ItemDAO {
     ItemDTO getItemByID(int id) {
         String sql = String.format("SELECT * FROM item WHERE item_id = \'%d\';", id);
         return getItem(sql);
-    }
-
-    private String insertStmt(int catId, String itemName, double itemPrice) {
-        return String.format("INSERT INTO item (cat_id, item_name, item_unit_price) VALUES (%d, \'%s\', %.2f)"
-                , catId, itemName, itemPrice);
     }
 
     private ItemDTO getItem(String sql) {

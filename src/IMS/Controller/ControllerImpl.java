@@ -90,7 +90,7 @@ public class ControllerImpl implements Controller {
 
     public void insertVendor(String... vendor) {
         illegalArgs(5, vendor);
-        this.model.insertVendor(vendor[0], vendor[1], vendor[2], Integer.parseInt(vendor[3]), vendor[4]);
+        this.model.insertVendor(vendor[0], vendor[1], vendor[2], vendor[3], vendor[4]);
 
     }
 
@@ -138,7 +138,7 @@ public class ControllerImpl implements Controller {
 
     public void insertStore(String... store) {
         illegalArgs(3, store);
-        this.model.insertStore(store[0], store[1], Integer.parseInt(store[2]));
+        this.model.insertStore(store[0], store[1], store[2]);
     }
 
 

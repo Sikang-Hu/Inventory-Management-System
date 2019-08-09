@@ -9,6 +9,7 @@ VALUES (1, 'fruit', 'this is a fruit'),
        (3, 'laptop', 'this is a laptop'),
        (4, 'car', 'this is a car');
 
+
 TRUNCATE TABLE item;
 INSERT INTO item
 VALUES (1, 1, 'apple', 0.5),
@@ -82,8 +83,7 @@ TRUNCATE TABLE sale;
 INSERT INTO sale
 VALUES (1, 1, 1, '2019-06-11'),
        (2, 1, 1, '2019-06-11'),
-       (3, 1, 2, '2019-06-11'),
-       (4, 1, 4, '2019-07-11');
+       (3, 1, 2, '2019-06-11');
 
 TRUNCATE TABLE sale_has_sku;
 # TODO: MUST USE insert_into_sale_has_sku(sale_id, item_id, sale_quantity, unit_sale_price)
@@ -91,19 +91,32 @@ CALL insert_into_sale_has_sku(1, 1, 20, 0.3);
 CALL insert_into_sale_has_sku(2, 1, 50, 0.35);
 CALL insert_into_sale_has_sku(3, 1, 20, 0.3);
 
-SELECT *
-FROM sale_has_sku;
+CALL save_inv_status_to_hist_inv(201923);
+CALL save_inv_status_to_hist_inv(201924);
+CALL save_inv_status_to_hist_inv(201925);
+CALL save_inv_status_to_hist_inv(201926);
+CALL save_inv_status_to_hist_inv(201927);
+CALL save_inv_status_to_hist_inv(201928);
+
+INSERT INTO sale
+VALUES (4, 1, 4, '2019-07-25');
+
+# THIS SHOULD FAIL; ROLLED BACK BY TRANSACTION
+CALL insert_into_sale_has_sku(4, 4, 3, 900);
+
+# THIS SHOULD SUCCEED
+CALL insert_into_sale_has_sku(4, 1, 30, 0.4);
+
 # Should be exactly the same as
 # INSERT INTO sale_has_sku
 # VALUES (1, 1, 20, 0.3),
 #        (2, 1, 30, 0.35),
 #        (2, 3, 20, 0.35),
 #        (3, 3, 20, 0.3);
+# (sale_id, sku_id, quantity, price)
 
-# THIS SHOULD FAIL
-CALL insert_into_sale_has_sku(4, 4, 3, 900);
-
-# THIS SHOULD SUCCEED
-CALL insert_into_sale_has_sku(4, 1, 30, 0.4);
+CALL save_inv_status_to_hist_inv(201929);
+CALL save_inv_status_to_hist_inv(201930);
+CALL save_inv_status_to_hist_inv(201931);
 
 SET FOREIGN_KEY_CHECKS = 1;

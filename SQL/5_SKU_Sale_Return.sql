@@ -12,6 +12,9 @@ BEGIN
     DECLARE stack_sku INT;
     DECLARE stack_remain INT;
     DECLARE stack_sale_price DECIMAL(8, 2);
+    DECLARE sql_error INT DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+        SET sql_error = TRUE;
 
     IF input_sale_id NOT IN (SELECT sale_id FROM sale) OR input_item_id NOT IN (SELECT item_id FROM item)
     THEN
@@ -41,6 +44,7 @@ BEGIN
 
     SET stack_quantity = input_quantity;
 
+    START TRANSACTION;
     WHILE stack_quantity > 0 DO
     SELECT sku_id, sale_quantity, unit_sale_price
     INTO stack_sku, stack_remain,stack_sale_price
@@ -57,6 +61,14 @@ BEGIN
 
     DELETE FROM sale_fifo_stack LIMIT 1;
     END WHILE;
+
+    IF sql_error = FALSE THEN
+        COMMIT;
+        SELECT 'Sale_Return succeed!' AS TRANSACTION_SUCCESS;
+    ELSE
+        ROLLBACK;
+        SELECT 'Sale_Return failed!' AS TRANSACTION_FAILURE;
+    END IF;
 
 END//
 DELIMITER ;
@@ -76,12 +88,9 @@ call get_weekly_sale_by_item(null, null);
 call get_cogs_by_sale(null, null);
 
 # TESTING
-SET autocommit = 0;
-START TRANSACTION;
 # RETURN 30 APPLES
-CALL insert_sale_return(2, 1, 30);
+# CALL insert_sale_return(2, 1, 30);
 # SALE 15 APPLES AFTER RETURN
-CALL insert_into_sale(1, now(), 1, null, @sale_id);
-CALL insert_into_sale_has_sku(@sale_id, 1, 15, 0.45);
-ROLLBACK;
-SET autocommit = 1;
+# CALL insert_into_sale(1, now(), 1, null, @sale_id);
+# CALL insert_into_sale_has_sku(@sale_id, 1, 15, 0.45);
+# Rerun 2_SKU_Mock_Data_Init.sql after testing.

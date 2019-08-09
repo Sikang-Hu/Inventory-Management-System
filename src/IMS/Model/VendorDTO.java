@@ -7,13 +7,13 @@ public class VendorDTO {
   private String vendorName;
   private String vendorAddress;
   private String vendorState;
-  private int vendorZip;
+  private String vendorZip;
   private String vendorDescription;
 
 
 
   VendorDTO(int vendorID, String vendorName, String vendorAddress, String vendorState,
-         int vendorZip, String vendorDescription) {
+         String vendorZip, String vendorDescription) {
     this.vendorID = vendorID;
     this.vendorName = vendorName;
     this.vendorAddress = vendorAddress;
@@ -23,12 +23,12 @@ public class VendorDTO {
   }
 
   VendorDTO(String vendorName, String vendorAddress, String vendorState,
-         int vendorZip, String vendorDescription) {
+         String vendorZip, String vendorDescription) {
     this(-1, vendorName, vendorAddress, vendorState, vendorZip, vendorDescription);
   }
 
   VendorDTO(String vendorName, String vendorAddress, String vendorState,
-         int vendorZip) {
+         String vendorZip) {
     this(-1, vendorName, vendorAddress, vendorState, vendorZip, null);
   }
 
@@ -74,7 +74,7 @@ public class VendorDTO {
     this.vendorState = vendorState;
   }
 
-  public int getVendorZip() {
+  public String getVendorZip() {
     return vendorZip;
   }
 

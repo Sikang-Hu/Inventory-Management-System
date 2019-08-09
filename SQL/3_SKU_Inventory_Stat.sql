@@ -115,3 +115,55 @@ END//
 DELIMITER ;
 
 CALL get_inventory_status_by_sku(null, null);
+
+DROP PROCEDURE IF EXISTS get_remaining_inventory_by_age_of_inv;
+DELIMITER //
+CREATE PROCEDURE get_remaining_inventory_by_age_of_inv(IN input_store_id INT,
+                                                       IN input_item_id INT)
+BEGIN
+    SELECT bought.sku_id,
+           bought.store_id,
+           bought.store_address,
+           bought.item_id,
+           bought.item_name,
+           bought.unit_cost,
+           bought.order_quantity,
+           bought.order_quantity - IF(sold.num IS NULL, 0, sold.num) AS remain,
+           DATEDIFF(NOW(), delivery_date)                            AS age_of_inv
+    FROM (SELECT sku.sku_id,
+                 sku.order_quantity,
+                 sku.unit_cost,
+                 rs.store_id,
+                 rs.store_address,
+                 i.item_id,
+                 i.item_name,
+                 so.delivery_date
+          FROM retail_store rs
+                   JOIN supply_order so ON rs.store_id = so.store_id
+                   JOIN sku ON so.order_id = sku.order_id
+                   JOIN item i ON sku.item_id = i.item_id
+          WHERE so.delivery_date IS NOT NULL
+         ) AS bought
+             LEFT JOIN
+         (SELECT sku.sku_id, SUM(shs.sale_quantity) AS num
+          FROM sku
+                   JOIN sale_has_sku shs ON sku.sku_id = shs.sku_id
+          GROUP BY sku.sku_id
+         ) AS sold ON (bought.sku_id = sold.sku_id)
+    WHERE 1 = 1
+      AND (
+        CASE # set condition for store_id
+            WHEN input_store_id IS NOT NULL THEN bought.store_id = input_store_id
+            ELSE 1 = 1
+            END)
+      AND (
+        CASE # set condition for item_id
+            WHEN input_item_id IS NOT NULL THEN bought.item_id = input_item_id
+            ELSE 1 = 1
+            END)
+    HAVING remain > 0
+    ORDER BY age_of_inv DESC, bought.store_id, bought.item_id, remain;
+END//
+DELIMITER ;
+
+CALL get_remaining_inventory_by_age_of_inv(null, null);

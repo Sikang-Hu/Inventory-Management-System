@@ -5,6 +5,7 @@ import IMS.Model.ItemDTO;
 import IMS.Model.ItemInTransaction;
 import IMS.Model.RetailStoreDTO;
 import IMS.Model.SaleDTO;
+import IMS.Model.Status;
 import IMS.Model.SupplyOrderDTO;
 import IMS.Model.VendorDTO;
 
@@ -91,6 +92,18 @@ public class NaivePrinter {
                     .append("customer_id: ").append(i.getCustomer_id()).append("\n")
                     .append("store_id").append(i.getStore_id()).append("\n")
                     .append("order_date").append(i.getSaleDate()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public String printStatus(Status... statuses) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Status: \n");
+        for (Status i : statuses) {
+            sb.append("Store: ").append(i.getStore()).append("\n")
+                    .append("cat: ").append(i.getCat()).append("\n")
+                    .append("item:").append(i.getItem()).append("\n")
+                    .append("stock:").append(i.getStock()).append("\n");
         }
         return sb.toString();
     }

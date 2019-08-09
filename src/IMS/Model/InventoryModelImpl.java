@@ -3,6 +3,7 @@ package IMS.Model;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 
 import IMS.IMSException;
+import IMS.NaivePrinter;
 
 import java.sql.*;
 
@@ -32,7 +33,7 @@ public class InventoryModelImpl implements InventoryModel {
 
     //item related
     @Override
-    public void insertItem(String category, String name, double unitPrice) {
+    public void insertItem(String name, String category, double unitPrice) {
         ItemDTO item = new ItemDTO(category, name, unitPrice);
         new ItemDAO().insertItem(item);
     }
@@ -50,7 +51,8 @@ public class InventoryModelImpl implements InventoryModel {
 
     //Vendor related
     @Override
-    public void insertVendor(String name, String address, String state, int zip, String description) {
+    public void insertVendor(String name, String address, String state, String zip,
+                             String description) {
         VendorDTO v = new VendorDTO(name, address, state, zip, description);
         new VendorDAO().insertVendor(v);
     }
@@ -66,6 +68,7 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
+    //TODO： test procedure missing
     public Set<ItemDTO> getSoldItems(String name) {
         VendorDAO vendorDAT = new VendorDAO();
         VendorDTO v = vendorDAT.getVendorByName(name);
@@ -73,8 +76,9 @@ public class InventoryModelImpl implements InventoryModel {
     }
 
     @Override
-    public void addSoldItem(String vendor, Iterable<ItemDTO> collection) {
-      new VendorDAO().addSoldItem(vendor, collection);
+    public List<ItemDTO> addSoldItem(String vendor, Iterable<ItemDTO> collection) {
+      List<ItemDTO> ItemsNoInRecords = new VendorDAO().addSoldItem(vendor, collection);
+      return ItemsNoInRecords;
     }
 
 
@@ -82,7 +86,7 @@ public class InventoryModelImpl implements InventoryModel {
     @Override
     public List<Status> getInvStatus(Integer store_id, String item_name, String cat_name) {
         try (Connection con = DatabaseUtil.createConnection();
-             CallableStatement stmt = con.prepareCall("{CALL INV_STATUS(?, ?, ?)}")) {
+             CallableStatement stmt = con.prepareCall("{CALL GET_INVENTORY_STATUS_BY_ITEM(?, ?, ?)}")) {
           if (store_id == null) {
             stmt.setNull(1, Types.INTEGER);
           }
@@ -122,7 +126,7 @@ public class InventoryModelImpl implements InventoryModel {
 
     //store
     @Override
-    public void insertStore(String address, String state, int zipCode) {
+    public void insertStore(String address, String state, String zipCode) {
       RetailStoreDTO store = new RetailStoreDTO(address, state, zipCode);
       new RetailStoreDAO().insertStore(store);
     }
@@ -217,6 +221,7 @@ public class InventoryModelImpl implements InventoryModel {
     @Override
     public void returnSale(int sale_id, String item_name, int quantity) {
       int item_id = new ItemDAO().getItemByName(item_name).getItemId();
+      System.out.println(item_id);
       new SaleDAO().returnSale(sale_id, item_id, quantity);
     }
 

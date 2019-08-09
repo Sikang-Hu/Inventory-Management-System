@@ -13,7 +13,7 @@ public class RetailStoreDAO {
 
   public int insertStore(RetailStoreDTO store) {
     String sql = "INSERT INTO retail_store (store_address, store_state, store_zip) VALUES ('"
-            + store.getStoreAddress()+"', '"+store.getStoreState()+"', " + store.getStoreZip() + ")";
+            + store.getStoreAddress()+"', '"+store.getStoreState()+"', '" + store.getStoreZip() + "')";
     return new DatabaseUtil().insertOneRecord(sql);
   }
 
@@ -32,7 +32,7 @@ public class RetailStoreDAO {
       ResultSet rs = stmt.executeQuery(sql);
       while (rs.next()) {
         result.add(new RetailStoreDTO(rs.getInt(1), rs.getString(2),
-                rs.getString(3), rs.getInt(4)));
+                rs.getString(3), rs.getString(4)));
       }
       return result;
     } catch (SQLException e) {
@@ -48,7 +48,7 @@ public class RetailStoreDAO {
       ResultSet rs = stmt.executeQuery(sql);
       if (rs.next()) {
         return new RetailStoreDTO(rs.getInt(1), rs.getString(2),
-                rs.getString(3), rs.getInt(4));
+                rs.getString(3), rs.getString(4));
       }
       else {
         throw new IMSException("Store_id doesn't exist");

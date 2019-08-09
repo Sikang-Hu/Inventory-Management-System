@@ -14,7 +14,7 @@ public class CustomerDAO {
     }
     try (Connection con = DatabaseUtil.createConnection();
          Statement stmt = con.createStatement()) {
-      String sql = "SELECT * FROM customer WHERE order_id =" + cus_id;
+      String sql = "SELECT * FROM customer WHERE cus_id =" + cus_id;
       ResultSet rs = stmt.executeQuery(sql);
       if (rs.next()) {
         return rs.getString(2);

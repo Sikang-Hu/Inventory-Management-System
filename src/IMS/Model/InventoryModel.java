@@ -21,7 +21,7 @@ public interface InventoryModel {
   ItemDTO getItemByID(int id);
 
   //Vendor related
-  void insertVendor(String name, String address, String state, int zip, String description);
+  void insertVendor(String name, String address, String state, String zip, String description);
 
   VendorDTO getVendorByName(String name);
 
@@ -29,16 +29,15 @@ public interface InventoryModel {
 
   Set<ItemDTO> getSoldItems(String name);
 
-  void addSoldItem(String vendor, Iterable<ItemDTO> collection);
+  List<ItemDTO> addSoldItem(String vendor, Iterable<ItemDTO> collection);
 
   //Status related
   List<Status> getInvStatus(Integer store_id, String item_name, String cat_name);
 
   //store related
-  void insertStore(String address, String state, int zipCode);
+  void insertStore(String address, String state, String zipCode);
 
   RetailStoreDTO getStoresByID(int storeID);
-
 
   List<RetailStoreDTO> getAllStore();
 

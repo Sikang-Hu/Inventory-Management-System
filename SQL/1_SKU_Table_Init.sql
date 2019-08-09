@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS item_category;
 CREATE TABLE IF NOT EXISTS item_category
 (
     cat_id          INT PRIMARY KEY AUTO_INCREMENT,
-    cat_name        VARCHAR(30),
+    cat_name        VARCHAR(30) UNIQUE,
     cat_description VARCHAR(255)
 );
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS item
 (
     item_id         INT PRIMARY KEY AUTO_INCREMENT,
     cat_id          INT NOT NULL,
-    item_name       VARCHAR(30),
+    item_name       VARCHAR(30) UNIQUE,
     item_unit_price DECIMAL(8, 2),
 
     CONSTRAINT item_FK_cat FOREIGN KEY (cat_id) REFERENCES item_category (cat_id)
@@ -28,10 +28,10 @@ DROP TABLE IF EXISTS vendor;
 CREATE TABLE IF NOT EXISTS vendor
 (
     ven_id          INT PRIMARY KEY AUTO_INCREMENT,
-    ven_name        VARCHAR(30),
+    ven_name        VARCHAR(30) UNIQUE,
     ven_address     VARCHAR(30),
     ven_state       CHAR(2),
-    ven_zip         INT,
+    ven_zip         CHAR(10),
     ven_description VARCHAR(255)
 );
 
@@ -51,9 +51,9 @@ DROP TABLE IF EXISTS retail_store;
 CREATE TABLE IF NOT EXISTS retail_store
 (
     store_id      INT PRIMARY KEY AUTO_INCREMENT,
-    store_address VARCHAR(255),
+    store_address VARCHAR(255) UNIQUE, # include street, city, state, zip
     store_state   CHAR(2),
-    store_zip     INT
+    store_zip     CHAR(10)
 );
 
 
@@ -119,6 +119,32 @@ CREATE TABLE IF NOT EXISTS sale_has_sku
     CONSTRAINT si_fk_sku FOREIGN KEY (sku_id) REFERENCES sku (sku_id)
 );
 
+# this table stores historical inventory data.
+# typical user should have no access to this table.
+# for analytical purposes only.
+DROP TABLE IF EXISTS hist_inv;
+CREATE TABLE IF NOT EXISTS hist_inv
+(
+    store_id   INT,
+    item_id    INT,
+    inv_remain INT,
+    inv_value  DECIMAL(8, 2),
+    year_week  INT
+);
+
+DROP TABLE IF EXISTS inv_reminder;
+CREATE TABLE IF NOT EXISTS inv_reminder
+(
+    store_id INT,
+    item_id  INT,
+    message  VARCHAR(255),
+
+    PRIMARY KEY (store_id, item_id),
+    FOREIGN KEY (store_id) REFERENCES retail_store (store_id),
+    FOREIGN KEY (item_id) REFERENCES item (item_id)
+);
+
+
 # making sure the vendor has the item available for sell
 DROP TRIGGER IF EXISTS verify_vhi_for_sku_insertion;
 DELIMITER //
@@ -150,8 +176,12 @@ CREATE PROCEDURE insert_into_supply_order(IN input_ven_id INT,
                                           IN input_store_id INT,
                                           IN input_order_date DATE) # date can be ignored if set to NOW()
 BEGIN
+    # insert into supply_order
+    # order_id auto increment
+    # delivery_date starts with null for every new supply_order
     INSERT INTO supply_order (ven_id, store_id, order_date)
     VALUES (input_ven_id, input_store_id, input_order_date);
+
 END//
 DELIMITER ;
 
@@ -163,10 +193,24 @@ CREATE PROCEDURE update_order_for_delivery(
     IN input_order_id INT
 )
 BEGIN
+    DECLARE sql_error INT DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+        SET sql_error = TRUE;
+
+    START TRANSACTION;
+    # do nothing if delivery_date is not null
     IF (SELECT delivery_date FROM supply_order WHERE order_id = input_order_id) IS NULL THEN
         UPDATE supply_order o
         SET o.delivery_date = NOW()
         WHERE o.order_id = input_order_id;
+    END IF;
+
+    IF sql_error = FALSE THEN
+        COMMIT;
+        SELECT 'Update delivery_date to now() succeed!' AS TRANSACTION_SUCCESS;
+    ELSE
+        ROLLBACK;
+        SELECT 'Update delivery_date to now() failed!' AS TRANSACTION_FAILURE;
     END IF;
 END//
 DELIMITER ;
@@ -182,6 +226,7 @@ CREATE PROCEDURE insert_into_sku(IN input_order_id INT, # TODO: JAVA need to pro
 BEGIN
     INSERT INTO sku (order_id, item_id, order_quantity, unit_cost)
     VALUES (input_order_id, input_item_id, input_order_quantity, input_unit_cost);
+
 END//
 DELIMITER ;
 
@@ -189,25 +234,31 @@ DELIMITER ;
 -- Sale Insertion Procedure ## AUTO_INCREMENT ID
 # Insert into sale table procedure.
 # Will create new customer if current customer id is not in customer table.
+# Output new sale_id for Java access and shs insertion procedure/
 DROP PROCEDURE IF EXISTS insert_into_sale;
 DELIMITER //
 CREATE PROCEDURE insert_into_sale(IN input_store_id INT,
-                                  IN input_sale_date DATETIME,
+                                  IN input_sale_date DATE,
                                   IN input_cus_id INT, # can be null
                                   IN input_cus_name VARCHAR(30), # can be null
                                   OUT output_sale_id INT)
 BEGIN
+    # create new customer if cus_id is null or not exist
     IF input_cus_id IS NULL THEN
         INSERT INTO customer (cus_name) VALUES (input_cus_name);
         # reset input_cus_id in case of NULL
-        SET input_cus_id = (SELECT cus_id FROM customer ORDER BY cus_id DESC LIMIT 1);
+        # SET input_cus_id = (SELECT cus_id FROM customer ORDER BY cus_id DESC LIMIT 1);
+        SET input_cus_id = LAST_INSERT_ID();
     ELSEIF input_cus_id NOT IN (SELECT cus_id FROM customer) THEN
         INSERT INTO customer VALUES (input_cus_id, input_cus_name);
     END IF;
+
     # insert into sell
     INSERT INTO sale (store_id, cus_id, sale_date) VALUES (input_store_id, input_cus_id, input_sale_date);
     # return new sale_id for SHS insertions
-    SELECT sale_id INTO output_sale_id FROM sale ORDER BY sale_id DESC LIMIT 1;
+    # SELECT sale_id INTO output_sale_id FROM sale ORDER BY sale_id DESC LIMIT 1;
+    SET output_sale_id = LAST_INSERT_ID(); # should serve the same purpose
+
 END//
 DELIMITER ;
 
@@ -360,10 +411,83 @@ BEGIN
         INSERT INTO sale_has_sku VALUES (input_sale_id, stack_sku, stack_quantity, input_unit_sale_price);
         SET stack_quantity = 0;
     END IF;
-
+    # remove top row from the stack
     DELETE FROM fifo_stack LIMIT 1;
     END WHILE;
 
 END//
 DELIMITER ;
 
+-- save current inventory status into hist_inv with current year week
+DROP PROCEDURE IF EXISTS save_inv_status_to_hist_inv;
+DELIMITER //
+CREATE PROCEDURE save_inv_status_to_hist_inv(
+    IN input_year_week INT
+)
+BEGIN
+    DECLARE sql_error INT DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+        SET sql_error = TRUE;
+
+    # inv_status has about the same data as inv_status() returns
+    CREATE TEMPORARY TABLE IF NOT EXISTS inv_status
+    SELECT store_id, item_id, SUM(remain) AS inv_remain, SUM(unit_cost * remain) AS inv_value
+    FROM (SELECT bought.sku_id,
+                 bought.store_id,
+                 bought.item_id,
+                 bought.unit_cost,
+                 bought.order_quantity - IF(sold.num IS NULL, 0, sold.num) AS remain
+          FROM (SELECT sku.sku_id,
+                       sku.order_quantity,
+                       sku.unit_cost,
+                       rs.store_id,
+                       i.item_id
+                FROM retail_store rs
+                         JOIN supply_order so ON rs.store_id = so.store_id
+                         JOIN sku ON so.order_id = sku.order_id
+                         JOIN item i ON sku.item_id = i.item_id
+                WHERE so.delivery_date IS NOT NULL
+               ) AS bought
+                   LEFT JOIN
+               (SELECT sku.sku_id, SUM(shs.sale_quantity) AS num
+                FROM sku
+                         JOIN sale_has_sku shs ON sku.sku_id = shs.sku_id
+                GROUP BY sku.sku_id
+               ) AS sold ON (bought.sku_id = sold.sku_id)
+         ) AS inv
+    GROUP BY store_id, item_id
+    ORDER BY store_id, item_id;
+
+    START TRANSACTION;
+    # insert every entry in current inventory status to hist_inv table
+    INSERT INTO hist_inv (store_id, item_id, inv_remain, inv_value, year_week)
+    SELECT store_id, item_id, inv_remain, inv_value, input_year_week
+    FROM inv_status;
+
+    IF sql_error = FALSE THEN
+        COMMIT;
+        SELECT 'Insert into hist_inv succeed!' AS TRANSACTION_SUCCESS;
+    ELSE
+        ROLLBACK;
+        SELECT 'Insert into hist_inv failed!' AS TRANSACTION_FAILURE;
+    END IF;
+
+    DROP TEMPORARY TABLE IF EXISTS inv_status;
+END//
+DELIMITER ;
+
+# turn on global event scheduler
+SET GLOBAL event_scheduler = ON;
+-- run save_inv_status_to_hist_inv() every sunday
+DROP EVENT IF EXISTS weekly_hist_inv_update;
+CREATE EVENT IF NOT EXISTS weekly_hist_inv_update
+    ON SCHEDULE
+        EVERY 1 WEEK
+            STARTS CURRENT_DATE + INTERVAL 6 - WEEKDAY(CURRENT_DATE) DAY # every sunday
+    ON COMPLETION # event preserves after completion
+        PRESERVE
+    DO CALL save_inv_status_to_hist_inv(YEARWEEK(NOW()));
+
+# SHOW EVENTS FROM ims_SKU;
+# turn this off to disable the event
+# SET GLOBAL event_scheduler = OFF;

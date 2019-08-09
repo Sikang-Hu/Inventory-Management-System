@@ -17,12 +17,12 @@ public class CategoryDAO {
     }
 
     public CategoryDTO getCatByName(String name)  {
-        String sql = String.format("SELECT cat_id FROM item_category WHERE cat_name = \'%s\';", name);
+        String sql = String.format("SELECT * FROM item_category WHERE cat_name = \'%s\';", name);
         return getCat(sql);
     }
 
     public CategoryDTO getCatByID(int catId) {
-        String sql = String.format("SELECT cat_id FROM item_category WHERE cat_id = %d", catId);
+        String sql = String.format("SELECT * FROM item_category WHERE cat_id = %d", catId);
         return getCat(sql);
     }
 
@@ -30,8 +30,10 @@ public class CategoryDAO {
         try (Connection con = DatabaseUtil.createConnection();
              Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
+
             if (rs.next()) {
-                return new CategoryDTO(rs.getInt(1), rs.getString(2), rs.getString(3));
+                return new CategoryDTO(rs.getInt(1),
+                        rs.getString(2), rs.getString(3));
             } else {
                 throw new IMSException("Category_doesn't exist");
             }

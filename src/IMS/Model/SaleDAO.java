@@ -159,7 +159,6 @@ public class SaleDAO {
             cstmt.setInt(3, quantity);
             cstmt.execute();
         } catch (SQLException e) {
-            DatabaseUtil.rollback(con);
             e.printStackTrace();
             throw new IMSException(e.getMessage());
         } finally {

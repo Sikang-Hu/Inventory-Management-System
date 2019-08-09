@@ -4,17 +4,17 @@ public class RetailStoreDTO {
   private int storeId;
   private String storeAddress;
   private String StoreState;
-  private int storeZip;
+  private String storeZip;
 
 
-  public RetailStoreDTO(int storeId, String storeAddress, String StoreState, int storeZip) {
+  public RetailStoreDTO(int storeId, String storeAddress, String StoreState, String storeZip) {
     this.storeId = storeId;
     this.storeAddress = storeAddress;
     this.StoreState = StoreState;
     this.storeZip = storeZip;
   }
 
-  public RetailStoreDTO(String storeAddress, String StoreState, int storeZip) {
+  public RetailStoreDTO(String storeAddress, String StoreState, String storeZip) {
     this.storeId = -1;
     this.storeAddress = storeAddress;
     this.StoreState = StoreState;
@@ -56,11 +56,11 @@ public class RetailStoreDTO {
     this.StoreState = StoreState;
   }
 
-  public int getStoreZip() {
+  public String getStoreZip() {
     return storeZip;
   }
 
-  public void setStoreZip(int storeZip) {
+  public void setStoreZip(String storeZip) {
     this.storeZip = storeZip;
   }
 }
