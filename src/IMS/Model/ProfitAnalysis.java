@@ -23,6 +23,7 @@ public class ProfitAnalysis {
 
     public class profitAnalysisObject {
         private int itemID;
+        private String itemName;
         private int storeID;
         private double avgInventory = 0;
         private double profit = 0;
@@ -42,8 +43,16 @@ public class ProfitAnalysis {
             this.profit = this.profit + profit;
         }
 
+        void setItemName(String name) {
+            this.itemName = name;
+        }
+
         public int getItemID() {
             return itemID;
+        }
+
+        public String getItemName() {
+            return itemName;
         }
 
         public int getStoreID() {
@@ -75,6 +84,7 @@ public class ProfitAnalysis {
         @Override
         public String toString() {
             return "itemID: " + this.itemID +
+                    "       itemName " + this.itemName +
                     "       storeID " + this.storeID +
                     "       avgInventory: " +  String.format("%.2f", this.avgInventory) +
                     "       profit: " + String.format("%.2f", this.profit) +
@@ -159,6 +169,7 @@ public class ProfitAnalysis {
                 profitAnalysisObject object = this.map.get(newObject.hashCode());
                 if (object != null) {
                     object.increaseProfit(rs.getDouble(5));
+                    object.setItemName(rs.getString(4));
                     object.computeRatio();
 
                 }

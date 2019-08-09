@@ -17,17 +17,23 @@ public class Turnover {
 
     public class turnoverObject {
         private int itemID;
+        private String  itemName;
         private int storeID;
         private double turnover;
 
-        turnoverObject (int item_id, int storeID, double turnover) {
+        turnoverObject (int item_id, String itemName, int storeID, double turnover) {
             this.itemID = item_id;
+            this.itemName = itemName;
             this.storeID = storeID;
             this.turnover = turnover;
         }
 
         public int getItemID() {
             return this.itemID;
+        }
+
+        public String getItemName() {
+            return itemName;
         }
 
         public int getStoreID() {
@@ -41,6 +47,7 @@ public class Turnover {
         @Override
         public String toString() {
             return "itemID: " + this.itemID +
+                    " itemName: " + this.itemName +
                     " storeID: " + this.storeID +
                     " turnover: " + this.turnover;
         }
@@ -77,9 +84,10 @@ public class Turnover {
              Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                turnoverObject object = new turnoverObject(rs.getInt(2),
+                turnoverObject object = new turnoverObject(rs.getInt(3),
+                        rs.getString(4),
                         rs.getInt(1),
-                        rs.getDouble(7));
+                        rs.getDouble(9));
                 list.add(object);
             }
             list.sort(Comparator.comparing(turnoverObject::getTurnover).reversed());

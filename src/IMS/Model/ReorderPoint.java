@@ -13,6 +13,7 @@ public class ReorderPoint {
 
     public class reorderObject{
         private int itemID;
+        private String  itemName;
         private int storeID;
         private String message;
 
@@ -21,6 +22,9 @@ public class ReorderPoint {
             this.storeID = storeID;
             this.message = message;
         }
+
+        void setItemName() {this.itemName = new ItemDAO().getItemByID(this.itemID).getItemName();}
+
 
         public int getitemID() {
             return this.itemID;
@@ -38,8 +42,9 @@ public class ReorderPoint {
 
         @Override
         public String toString() {
-            return "item_id: " + this.itemID +
-                    " storeID: " + this.storeID +
+            return //"item_id: " + this.itemID +
+                   " itemName: " + this.itemName +
+                    //" storeID: " + this.storeID +
                     " message: " + this.message;
         }
     }
@@ -75,6 +80,7 @@ public class ReorderPoint {
             while (rs.next()) {
                 reorderObject object = new reorderObject(rs.getInt(2), rs.getInt(1),
                         rs.getString(3));
+                object.setItemName();
                 list.add(object);
             }
 
