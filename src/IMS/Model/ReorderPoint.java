@@ -11,7 +11,7 @@ import IMS.IMSException;
 
 public class ReorderPoint {
 
-    class reorderObject{
+    public class reorderObject{
         private int itemID;
         private int storeID;
         private String message;
@@ -22,17 +22,17 @@ public class ReorderPoint {
             this.message = message;
         }
 
-        int getitemID() {
+        public int getitemID() {
             return this.itemID;
         }
 
 
-        int getStoreID() {
+        public int getStoreID() {
             return this.storeID;
         }
 
 
-        String  getMessage() {
+        public String  getMessage() {
             return this.message;
         }
 

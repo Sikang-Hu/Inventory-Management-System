@@ -15,7 +15,7 @@ import IMS.IMSException;
 public class InventoryAge {
 
 
-    class inventoryAgeObject {
+    public class inventoryAgeObject {
         private int itemID;
         private int SKUID;
         private String name;
@@ -30,8 +30,19 @@ public class InventoryAge {
 
         }
 
+        public int getItemID() {
+            return this.itemID;
+        }
 
-        int getAge() {
+        public int getSKUID() {
+            return this.SKUID;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public int getAge() {
             return this.age;
         }
 

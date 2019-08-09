@@ -15,15 +15,23 @@ import IMS.IMSException;
 public class Turnover {
 
 
-    class turnoverObject {
+    public class turnoverObject {
         private int itemID;
-        private double storeID;
+        private int storeID;
         private double turnover;
 
         turnoverObject (int item_id, int storeID, double turnover) {
             this.itemID = item_id;
             this.storeID = storeID;
             this.turnover = turnover;
+        }
+
+        public int getItemID() {
+            return this.itemID;
+        }
+
+        public int getStoreID() {
+            return this. storeID;
         }
 
         double getTurnover() {

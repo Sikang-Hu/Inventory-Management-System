@@ -42,6 +42,18 @@ public class ProfitAnalysis {
             this.profit = this.profit + profit;
         }
 
+        public int getItemID() {
+            return itemID;
+        }
+
+        public int getStoreID() {
+            return storeID;
+        }
+
+        public double getAvgInventory() {
+            return avgInventory;
+        }
+
         double getProfit() {
             return this.profit;
         }
@@ -51,7 +63,7 @@ public class ProfitAnalysis {
 
         }
 
-        double getRatio() {
+        public double getRatio() {
             return this.ratio;
         }
 
