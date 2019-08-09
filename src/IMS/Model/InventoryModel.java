@@ -2,6 +2,7 @@ package IMS.Model;
 
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -70,7 +71,7 @@ public interface InventoryModel {
 
   List<ReorderPoint.reorderObject> getReminderByStoreId(int storeId);
 
-  List<ReorderPoint.reorderObject> getReminderByItemIdAndStoreId(int itemId, int storeId);
+  ReorderPoint.reorderObject getReminderByItemIdAndStoreId(int itemId, int storeId);
 
   List<ReorderPoint.reorderObject> getAllReminders();
 
@@ -79,7 +80,7 @@ public interface InventoryModel {
 
   List<InventoryAge.inventoryAgeObject> getAgeByStoreId(int storeId);
 
-  List<InventoryAge.inventoryAgeObject> getAgeByItemIdAndStoreId(int itemId, int storeId);
+  InventoryAge.inventoryAgeObject getAgeByItemIdAndStoreId(int itemId, int storeId);
 
   List<InventoryAge.inventoryAgeObject> getAllAges();
 
@@ -88,7 +89,22 @@ public interface InventoryModel {
 
   List<Turnover.turnoverObject> getTurnoverByStoreId(int storeId, int numPastWeek);
 
-  List<Turnover.turnoverObject> getTurnoverByItemIdAndStoreId(int itemId, int storeId, int numPastWeek);
+  Turnover.turnoverObject getTurnoverByItemIdAndStoreId(int itemId, int storeId, int numPastWeek);
 
   List<Turnover.turnoverObject> getAllTurnovers(int numPastWeek);
-  }
+
+  //Profit analysis related
+  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemId
+  (int itemID, Date startDate, Date endDate);
+
+  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByStoreId
+  (int storeID, Date startDate, Date endDate);
+
+  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemIdAndStoreId
+  (int storeID, int itemID, Date startDate, Date endDate);
+
+  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getAllProfitRatio
+  (Date startDate, Date endDate);
+
+
+}

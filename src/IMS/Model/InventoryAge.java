@@ -86,13 +86,4 @@ public class InventoryAge {
     }
 
 
-    public static void main(String[] args) {
-        List<inventoryAgeObject> list=  new InventoryAge().getAllAges();
-        for (inventoryAgeObject o : list) {
-            System.out.println(o);
-
-        }
-    }
-
-
 }
