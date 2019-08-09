@@ -6,8 +6,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -18,7 +21,7 @@ public class ProfitAnalysis {
 
      private HashMap<Integer, profitAnalysisObject> map = new HashMap<>();
 
-    class profitAnalysisObject {
+    public class profitAnalysisObject {
         private int itemID;
         private int storeID;
         private double avgInventory = 0;
@@ -60,10 +63,10 @@ public class ProfitAnalysis {
         @Override
         public String toString() {
             return "itemID: " + this.itemID +
-                    "storeID " + this.storeID +
-                    " avgInventory: " + this.avgInventory +
-                    " profit: " + this.profit +
-                    " ratio: " + this.ratio;
+                    "       storeID " + this.storeID +
+                    "       avgInventory: " +  String.format("%.2f", this.avgInventory) +
+                    "       profit: " + String.format("%.2f", this.profit) +
+                    "       ratio: " + String.format("%.2f", this.ratio);
         }
 
     }
@@ -98,13 +101,13 @@ public class ProfitAnalysis {
              Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
+                if (rs.getDouble(4) != 0) {
                 profitAnalysisObject object = new profitAnalysisObject(rs.getInt(2),
                                               rs.getInt(1));
                 object.setAvgInventory(rs.getDouble(4));
                 this.map.put(object.hashCode(), object);
-//                System.out.println(object);
 
-            }
+            }}
         } catch (SQLException e) {
             e.printStackTrace();
             throw new IMSException(e.getMessage());
@@ -112,25 +115,25 @@ public class ProfitAnalysis {
     }
 
     private void getProfitByItemID(int itemID, String startDate, String endDate) {
-        String sql = "CALL get_weekly_profit_by_item(null," + itemID + ", " + startDate +
+        String sql = "CALL get_total_profit_by_item(null," + itemID + ", " + startDate +
                      ", " + endDate + ");";
         filterProfit(sql);
     }
 
     private void getProfitByStoreID(int storeID, String startDate, String endDate) {
-        String sql = "CALL get_weekly_profit_by_item("+ storeID +", null," + startDate +
+        String sql = "CALL get_total_profit_by_item("+ storeID +", null," + startDate +
                 ", " + endDate +");";
         filterProfit(sql);
     }
 
     private void getProfitByItemIDAndStoreID(int itemID, int storeID, String startDate, String endDate) {
-        String sql = "CALL get_weekly_profit_by_item(" + storeID + ", "+ itemID
+        String sql = "CALL get_total_profit_by_item(" + storeID + ", "+ itemID
                       + ", " + startDate + ", " + endDate + ");";
         filterProfit(sql);
     }
 
     private void getAllProfit(String startDate, String endDate) {
-        String sql =  "CALL get_weekly_profit_by_item(null, null," + startDate + ", " + endDate + ");";
+        String sql =  "CALL get_total_profit_by_item(null, null," + startDate + ", " + endDate + ");";
         filterProfit(sql);
     }
 
@@ -140,12 +143,13 @@ public class ProfitAnalysis {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 profitAnalysisObject newObject = new profitAnalysisObject(rs.getInt(3),
-                                                 rs.getInt(1));
+                        rs.getInt(1));
                 profitAnalysisObject object = this.map.get(newObject.hashCode());
-                object.increaseProfit(rs.getDouble(5));
-                object.computeRatio();
-//                System.out.println(object);
+                if (object != null) {
+                    object.increaseProfit(rs.getDouble(5));
+                    object.computeRatio();
 
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -153,7 +157,7 @@ public class ProfitAnalysis {
         }
     }
 
-    void getProfitRatioByItemId(int itemID, Date startDate, Date endDate) {
+    List<profitAnalysisObject> getProfitRatioByItemId(int itemID, Date startDate, Date endDate) {
         String start;
         String end;
         if (startDate == null || endDate == null) {
@@ -168,9 +172,10 @@ public class ProfitAnalysis {
 
         getAvgInventoryByItemID(itemID, start, end);
         getProfitByItemID(itemID, start, end);
+        return mapToList(this.map);
     }
 
-    void getProfitRatioByStoreId(int storeID, Date startDate, Date endDate) {
+    List<profitAnalysisObject> getProfitRatioByStoreId(int storeID, Date startDate, Date endDate) {
         String start;
         String end;
         if (startDate == null || endDate == null) {
@@ -185,9 +190,11 @@ public class ProfitAnalysis {
 
         getAvgInventoryByStoreID(storeID, start, end);
         getProfitByStoreID(storeID, start, end);
+        return mapToList(this.map);
+
     }
 
-    void getProfitRatioByItemIdAndStoreId(int storeID, int itemID, Date startDate, Date endDate) {
+    profitAnalysisObject getProfitRatioByItemIdAndStoreId(int storeID, int itemID, Date startDate, Date endDate) {
         String start;
         String end;
         if (startDate == null || endDate == null) {
@@ -202,10 +209,12 @@ public class ProfitAnalysis {
 
         getAvgInventoryByItemIDAndStoreID(itemID, storeID, start, end);
         getProfitByItemIDAndStoreID(itemID, storeID, start, end);
+        return mapToList(this.map).get(0);
+
     }
 
 
-    void getAllProfitRatio(Date startDate, Date endDate) {
+    List<profitAnalysisObject> getAllProfitRatio(Date startDate, Date endDate) {
         String start;
         String end;
         if (startDate == null || endDate == null) {
@@ -220,15 +229,19 @@ public class ProfitAnalysis {
 
         getAllAvgInventory(start, end);
         getAllProfit(start, end);
-
-
-
+        return mapToList(this.map);
 
     }
 
-    HashMap<Integer, profitAnalysisObject> getMap() {
-        return this.map;
-    }
+    private List<profitAnalysisObject> mapToList(HashMap<Integer, profitAnalysisObject> map) {
+        List<profitAnalysisObject> list = new ArrayList<>();
+        for (Map.Entry<Integer, ProfitAnalysis.profitAnalysisObject> entry : map.entrySet()) {
+            list.add(entry.getValue());
+        }
+        list.sort(Comparator.comparing(profitAnalysisObject::getRatio).reversed());
 
+        return list;
+
+    }
     }
 

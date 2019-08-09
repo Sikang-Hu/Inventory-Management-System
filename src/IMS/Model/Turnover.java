@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class Turnover {
                         rs.getDouble(7));
                 list.add(object);
             }
+            list.sort(Comparator.comparing(turnoverObject::getTurnover).reversed());
 
             return list;
         } catch (SQLException e) {

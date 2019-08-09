@@ -94,16 +94,16 @@ public interface InventoryModel {
   List<Turnover.turnoverObject> getAllTurnovers(int numPastWeek);
 
   //Profit analysis related
-  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemId
+  List<ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemId
   (int itemID, Date startDate, Date endDate);
 
-  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByStoreId
+  List<ProfitAnalysis.profitAnalysisObject> getProfitRatioByStoreId
   (int storeID, Date startDate, Date endDate);
 
-  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemIdAndStoreId
+  ProfitAnalysis.profitAnalysisObject getProfitRatioByItemIdAndStoreId
   (int storeID, int itemID, Date startDate, Date endDate);
 
-  HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getAllProfitRatio
+  List<ProfitAnalysis.profitAnalysisObject> getAllProfitRatio
   (Date startDate, Date endDate);
 
 

@@ -309,36 +309,31 @@ public class InventoryModelImpl implements InventoryModel {
   //Profit analysis related
 
   @Override
-  public HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemId
+  public List<ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemId
   (int itemID, Date startDate, Date endDate) {
     ProfitAnalysis analysis =  new ProfitAnalysis();
-    analysis.getProfitRatioByItemId(itemID, startDate, endDate);
-    return analysis.getMap();
+    return analysis.getProfitRatioByItemId(itemID, startDate, endDate);
   }
 
   @Override
-  public HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByStoreId
+  public List<ProfitAnalysis.profitAnalysisObject> getProfitRatioByStoreId
   (int storeID, Date startDate, Date endDate) {
     ProfitAnalysis analysis =  new ProfitAnalysis();
-    analysis.getProfitRatioByStoreId(storeID, startDate, endDate);
-    return analysis.getMap();
+    return analysis.getProfitRatioByStoreId(storeID, startDate, endDate);
   }
 
   @Override
-  public HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getProfitRatioByItemIdAndStoreId
+  public ProfitAnalysis.profitAnalysisObject getProfitRatioByItemIdAndStoreId
   (int storeID, int itemID, Date startDate, Date endDate) {
     ProfitAnalysis analysis =  new ProfitAnalysis();
-    analysis.getProfitRatioByItemIdAndStoreId(storeID,itemID, startDate, endDate);
-    return analysis.getMap();
+    return analysis.getProfitRatioByItemIdAndStoreId(storeID,itemID, startDate, endDate);
   }
 
   @Override
-  public HashMap<Integer, ProfitAnalysis.profitAnalysisObject> getAllProfitRatio
+  public List<ProfitAnalysis.profitAnalysisObject> getAllProfitRatio
   (Date startDate, Date endDate) {
     ProfitAnalysis analysis =  new ProfitAnalysis();
-    analysis.getAllProfitRatio(startDate, endDate);
-    return analysis.getMap();
+    return analysis.getAllProfitRatio(startDate, endDate);
   }
-
 
 }
